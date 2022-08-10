@@ -25,6 +25,10 @@ const routes: Routes = [
     loadChildren: () => import('./signin/signin.module').then( m => m.SigninPageModule)
   },
   {
+    path: 'signup',
+    loadChildren: () => import('./signup/signup.module').then( m => m.SignupPageModule)
+  },
+  {
     path: 'resetpassword',
     loadChildren: () => import('./resetpassword/resetpassword.module').then( m => m.ResetpasswordPageModule),
     ...canActivate(redirectLoggedInToHome)
