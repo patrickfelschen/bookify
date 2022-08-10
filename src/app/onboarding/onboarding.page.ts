@@ -37,6 +37,6 @@ export class OnboardingPage implements OnInit {
 
   // Überspringen des Onboardings, navigieren zur Page 'Home'
   skip(): void {
-    this.router.navigate(['/signin']);
+    this.router.navigateByUrl('/signin', { replaceUrl: true });
   }
 }
