@@ -22,11 +22,13 @@ const routes: Routes = [
   },
   {
     path: 'signin',
-    loadChildren: () => import('./signin/signin.module').then( m => m.SigninPageModule)
+    loadChildren: () => import('./signin/signin.module').then( m => m.SigninPageModule),
+    ...canActivate(redirectLoggedInToHome)
   },
   {
     path: 'signup',
-    loadChildren: () => import('./signup/signup.module').then( m => m.SignupPageModule)
+    loadChildren: () => import('./signup/signup.module').then( m => m.SignupPageModule),
+    ...canActivate(redirectLoggedInToHome)
   },
   {
     path: 'resetpassword',
