@@ -12,27 +12,27 @@ const redirectLoggedInToHome = () => redirectLoggedInTo(['home']);
 const routes: Routes = [
   {
     path: 'onboarding',
-    loadChildren: () => import('./onboarding/onboarding.module').then( m => m.OnboardingPageModule),
+    loadChildren: () => import('./pages/onboarding/onboarding.module').then( m => m.OnboardingPageModule),
     ...canActivate(redirectLoggedInToHome)
   },
   {
     path: 'home',
-    loadChildren: () => import('./home/home.module').then( m => m.HomePageModule),
+    loadChildren: () => import('./pages/home/home.module').then( m => m.HomePageModule),
     ...canActivate(redirectUnauthorizedToSignIn)
   },
   {
     path: 'signin',
-    loadChildren: () => import('./signin/signin.module').then( m => m.SigninPageModule),
+    loadChildren: () => import('./pages/signin/signin.module').then( m => m.SigninPageModule),
     ...canActivate(redirectLoggedInToHome)
   },
   {
     path: 'signup',
-    loadChildren: () => import('./signup/signup.module').then( m => m.SignupPageModule),
+    loadChildren: () => import('./pages/signup/signup.module').then( m => m.SignupPageModule),
     ...canActivate(redirectLoggedInToHome)
   },
   {
     path: 'resetpassword',
-    loadChildren: () => import('./resetpassword/resetpassword.module').then( m => m.ResetpasswordPageModule),
+    loadChildren: () => import('./pages/resetpassword/resetpassword.module').then( m => m.ResetpasswordPageModule),
     ...canActivate(redirectLoggedInToHome)
   },
   {
