@@ -1,0 +1,18 @@
+ion-content {
+  --ion-background-color: var(--ion-color-primary);
+}
+
+ion-text, h2 {
+  color: var(--ion-color-light);
+}
+
+ion-slides {
+  height: 100%;
+}
+
+ion-button {
+  color: var(--ion-color-light-shade);
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
