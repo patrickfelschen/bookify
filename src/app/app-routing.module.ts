@@ -11,6 +11,10 @@ const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
+  {
+    path: 'signin',
+    loadChildren: () => import('./signin/signin.module').then( m => m.SigninPageModule)
+  },
 ];
 
 @NgModule({
