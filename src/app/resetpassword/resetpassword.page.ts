@@ -5,11 +5,12 @@ import { AlertController, LoadingController } from '@ionic/angular';
 import { AuthService } from '../services/auth.service';
 
 @Component({
-  selector: 'app-signin',
-  templateUrl: './signin.page.html',
-  styleUrls: ['./signin.page.scss'],
+  selector: 'app-resetpassword',
+  templateUrl: './resetpassword.page.html',
+  styleUrls: ['./resetpassword.page.scss'],
 })
-export class SigninPage implements OnInit {
+export class ResetpasswordPage implements OnInit {
+
   credentials: FormGroup;
 
   constructor(
@@ -24,30 +25,25 @@ export class SigninPage implements OnInit {
     return this.credentials.get('email');
   }
 
-  get password() {
-    return this.credentials.get('password');
-  }
-
   ngOnInit() {
     this.credentials = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
     });
   }
 
-  async signIn() {
+  async resetPassword() {
     // Ladeanzeige anzeigen
     const loading = await this.loadingController.create();
     await loading.present();
     // Benutzer anmelden
-    const user = await this.authService.signIn(this.credentials.value);
+    const status = await this.authService.resetPassword(this.credentials.value);
     // Ladeanzeige verstecken
     await loading.dismiss();
     // Status prüfen
-    if (user != null) {
-      this.router.navigateByUrl('home', { replaceUrl: true });
+    if (status === true) {
+      this.router.navigateByUrl('signin', { replaceUrl: true });
     } else {
-      this.showAlert('Anmeldung fehlgeschlagen', 'Versuche es erneut!');
+      this.showAlert('Zurücksetzen fehlgeschlagen', 'Versuche es erneut!');
     }
   }
 
@@ -66,11 +62,8 @@ export class SigninPage implements OnInit {
     await alert.present();
   }
 
-  async navigateToResetPassword() {
-    this.router.navigateByUrl('resetpassword', { replaceUrl: true });
+  async navigateToSignIn() {
+    this.router.navigateByUrl('signin', { replaceUrl: true });
   }
 
-  async navigateToSignUp() {
-    this.router.navigateByUrl('signup', { replaceUrl: true });
-  }
 }

@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="credentials" (ngSubmit)="signIn()">
+  <form [formGroup]="credentials" (ngSubmit)="signUp()">
 
     <ion-item fill="solid" class="ion-margin-bottom">
       <ion-icon slot="end" name="mail"></ion-icon>
@@ -19,9 +19,8 @@
       <ion-note slot="error" *ngIf="(password.dirty || password.touched) && password.errors">Passwort ungültig</ion-note>
     </ion-item>
 
-    <ion-button expand="full" type="submit" [disabled]="!credentials.valid">Anmelden</ion-button>
+    <ion-button expand="full" type="submit" [disabled]="!credentials.valid">Konto erstellen</ion-button>
   </form>
 
-  <ion-button expand="full" (click)="navigateToResetPassword()">Passwort vegessen?</ion-button>
-  <ion-button expand="full" (click)="navigateToSignUp()">Neues Konto erstellen</ion-button>
+  <ion-button expand="full" type="button" (click)="navigateToSignIn()">Zurück zur Anmeldung</ion-button>
 </ion-content>
