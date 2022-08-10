@@ -27,7 +27,6 @@ export class OnboardingPage implements OnInit {
   // Autoplay nach Laden der Page starten
   ionViewWillEnter() {
     this.onboardingSlides.startAutoplay();
-    console.log(this.onboardingSlides);
   }
 
   // Autoplay nach Verlassen der Page stoppen
