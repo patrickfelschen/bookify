@@ -36,10 +36,15 @@ const routes: Routes = [
     ...canActivate(redirectLoggedInToHome)
   },
   {
+    path: 'bookingoverview',
+    loadChildren: () => import('./pages/bookingoverview/bookingoverview.module').then( m => m.BookingoverviewPageModule),
+    ...canActivate(redirectUnauthorizedToSignIn)
+  },
+  {
     path: '**',
     redirectTo: 'onboarding',
     pathMatch: 'full'
-  }
+  },
 ];
 
 @NgModule({
