@@ -1,26 +1,46 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Bookify</ion-title>
+    <ion-title>Konto erstellen</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <form [formGroup]="credentials" (ngSubmit)="signUp()">
-
-    <ion-item fill="solid" class="ion-margin-bottom">
-      <ion-icon slot="end" name="mail"></ion-icon>
-      <ion-input type="email" placeholder="E-Mail" formControlName="email"></ion-input>
-      <ion-note slot="error" *ngIf="(email.dirty || email.touched) && email.errors">E-Mail ungültig</ion-note>
-    </ion-item>
-
-    <ion-item fill="solid" class="ion-margin-bottom">
-      <ion-icon slot="end" name="key"></ion-icon>
-      <ion-input type="password" placeholder="Passwort" formControlName="password"></ion-input>
-      <ion-note slot="error" *ngIf="(password.dirty || password.touched) && password.errors">Passwort ungültig</ion-note>
-    </ion-item>
-
-    <ion-button expand="full" type="submit" [disabled]="!credentials.valid">Konto erstellen</ion-button>
-  </form>
-
-  <ion-button expand="full" type="button" (click)="navigateToSignIn()">Zurück zur Anmeldung</ion-button>
+<ion-content>
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="8">
+        <ion-img src="../../assets/svg/signup_01.svg"></ion-img>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <form [formGroup]="credentials" (ngSubmit)="signUp()">
+          <ion-item class="ion-margin-bottom">
+            <ion-label position="floating">E-Mail Adresse</ion-label>
+            <ion-icon slot="end" name="mail"></ion-icon>
+            <ion-input type="email" placeholder="max@mustermann.de" formControlName="email"></ion-input>
+            <ion-note slot="error" *ngIf="(email.dirty || email.touched) && email.errors">E-Mail ungültig</ion-note>
+          </ion-item>
+          <ion-item class="ion-margin-bottom">
+            <ion-label position="floating">Passwort</ion-label>
+            <ion-icon slot="end" name="key"></ion-icon>
+            <ion-input type="password" placeholder="Passwort" formControlName="password"></ion-input>
+            <ion-note slot="error" *ngIf="(password.dirty || password.touched) && password.errors">Passwort ungültig
+            </ion-note>
+          </ion-item>
+          <ion-button expand="full" type="submit" [disabled]="!credentials.valid">Konto erstellen</ion-button>
+        </form>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
+
+<ion-footer>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-button expand="full" type="button" (click)="navigateToSignIn()">Zurück zur Anmeldung</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-footer>
