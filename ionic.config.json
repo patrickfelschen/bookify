@@ -1,0 +1,7 @@
+{
+  "name": "bookify",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
