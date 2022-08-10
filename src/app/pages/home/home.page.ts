@@ -25,4 +25,9 @@ export class HomePage {
     await loading.dismiss();
     this.router.navigateByUrl('signin', {replaceUrl: true});
   }
+
+  bookingOverview() {
+    // this.router.navigate(['/bookingoverview']);
+    this.router.navigateByUrl('bookingoverview', {replaceUrl: true});
+  }
 }
