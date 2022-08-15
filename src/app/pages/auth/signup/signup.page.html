@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Anmelden</ion-title>
+    <ion-title>Konto erstellen</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -8,32 +8,27 @@
   <ion-grid>
     <ion-row class="ion-justify-content-center">
       <ion-col size="8">
-        <ion-img src="../../assets/svg/signin_01.svg"></ion-img>
+        <ion-img src="../../assets/svg/signup_01.svg"></ion-img>
       </ion-col>
     </ion-row>
     <ion-row>
       <ion-col>
-        <form [formGroup]="credentials" (ngSubmit)="signIn()">
+        <form [formGroup]="credentials" (ngSubmit)="signUp()">
           <ion-item class="ion-margin-bottom">
             <ion-label position="floating">E-Mail Adresse</ion-label>
             <ion-icon slot="end" name="mail"></ion-icon>
-            <ion-input type="email" placeholder="max@mustermann.de" formControlName="email"></ion-input>
+            <ion-input type="email" placeholder="max@mustermann.de" formControlName="email" autocomplete="email"></ion-input>
             <ion-note slot="error" *ngIf="(email.dirty || email.touched) && email.errors">E-Mail ungültig</ion-note>
           </ion-item>
           <ion-item class="ion-margin-bottom">
             <ion-label position="floating">Passwort</ion-label>
             <ion-icon slot="end" name="key"></ion-icon>
-            <ion-input type="password" placeholder="min. 10 Zeichen" formControlName="password"></ion-input>
+            <ion-input type="password" placeholder="Passwort" formControlName="password" autocomplete="new-password"></ion-input>
             <ion-note slot="error" *ngIf="(password.dirty || password.touched) && password.errors">Passwort ungültig
             </ion-note>
           </ion-item>
-          <ion-button expand="full" type="submit" [disabled]="!credentials.valid">Anmelden</ion-button>
+          <ion-button expand="full" type="submit" [disabled]="!credentials.valid">Konto erstellen</ion-button>
         </form>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>
-        <ion-button fill="clear" expand="full" (click)="navigateToResetPassword()">Passwort vegessen?</ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>
@@ -43,8 +38,9 @@
   <ion-grid>
     <ion-row>
       <ion-col>
-        <ion-button expand="full" (click)="navigateToSignUp()">Neues Konto erstellen</ion-button>
+        <ion-button expand="full" type="button" (click)="navigateToSignIn()">Zurück zur Anmeldung</ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>
+
 </ion-footer>

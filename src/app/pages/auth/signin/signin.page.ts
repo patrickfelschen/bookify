@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-signin',
@@ -30,8 +30,20 @@ export class SigninPage implements OnInit {
 
   ngOnInit() {
     this.credentials = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(10)]],
+      email: [
+        '', [
+          Validators.required,
+          Validators.maxLength(30),
+          Validators.email
+        ]
+      ],
+      password: [
+        '', [
+          Validators.required,
+          Validators.minLength(10),
+          Validators.maxLength(40)
+        ]
+      ],
     });
   }
 
@@ -45,7 +57,7 @@ export class SigninPage implements OnInit {
     await loading.dismiss();
     // Status prüfen
     if (user != null) {
-      this.router.navigateByUrl('home', { replaceUrl: true });
+      this.router.navigateByUrl('completeprofile', { replaceUrl: true });
     } else {
       this.showAlert('Anmeldung fehlgeschlagen', 'Versuche es erneut!');
     }

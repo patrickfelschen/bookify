@@ -21,30 +21,35 @@ const routes: Routes = [
     ...canActivate(redirectUnauthorizedToSignIn)
   },
   {
-    path: 'signin',
-    loadChildren: () => import('./pages/signin/signin.module').then( m => m.SigninPageModule),
-    ...canActivate(redirectLoggedInToHome)
-  },
-  {
-    path: 'signup',
-    loadChildren: () => import('./pages/signup/signup.module').then( m => m.SignupPageModule),
-    ...canActivate(redirectLoggedInToHome)
-  },
-  {
-    path: 'resetpassword',
-    loadChildren: () => import('./pages/resetpassword/resetpassword.module').then( m => m.ResetpasswordPageModule),
-    ...canActivate(redirectLoggedInToHome)
-  },
-  {
     path: 'bookingoverview',
     loadChildren: () => import('./pages/bookingoverview/bookingoverview.module').then( m => m.BookingoverviewPageModule),
     ...canActivate(redirectUnauthorizedToSignIn)
   },
   {
+    path: 'completeprofile',
+    loadChildren: () => import('./pages/auth/completeprofile/completeprofile.module').then( m => m.CompleteprofilePageModule),
+    ...canActivate(redirectUnauthorizedToSignIn)
+  },
+  {
+    path: 'signin',
+    loadChildren: () => import('./pages/auth/signin/signin.module').then( m => m.SigninPageModule),
+    ...canActivate(redirectLoggedInToHome)
+  },
+  {
+    path: 'signup',
+    loadChildren: () => import('./pages/auth/signup/signup.module').then( m => m.SignupPageModule),
+    ...canActivate(redirectLoggedInToHome)
+  },
+  {
+    path: 'resetpassword',
+    loadChildren: () => import('./pages/auth/resetpassword/resetpassword.module').then( m => m.ResetpasswordPageModule),
+    ...canActivate(redirectLoggedInToHome)
+  },
+  {
     path: '**',
     redirectTo: 'onboarding',
     pathMatch: 'full'
-  },
+  }
 ];
 
 @NgModule({

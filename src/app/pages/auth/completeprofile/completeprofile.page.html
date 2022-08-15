@@ -1,0 +1,107 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="end">
+      <ion-button (click)="signOut()">
+        <ion-icon slot="icon-only" name="log-out" color="light"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title text-center>
+      Bookify
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-slides #slides class="swiper-no-swiping">
+    <ion-slide>
+      <ion-grid>
+        <ion-row class="ion-justify-content-center">
+          <ion-col size="8">
+            <ion-img src="../../assets/svg/signin_01.svg"></ion-img>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <form [formGroup]="name" (ngSubmit)="nextSlide()">
+              <ion-item class="ion-margin-bottom">
+                <ion-label position="floating">Vorname</ion-label>
+                <ion-icon slot="end" name="person"></ion-icon>
+                <ion-input type="text" placeholder="Max" formControlName="firstname" autocomplete="given-name"></ion-input>
+                <ion-note slot="error" *ngIf="(firstname.dirty || firstname.touched) && firstname.errors">Vorname
+                  ungültig</ion-note>
+              </ion-item>
+              <ion-item class="ion-margin-bottom">
+                <ion-label position="floating">Nachname</ion-label>
+                <ion-icon slot="end" name="person"></ion-icon>
+                <ion-input type="text" placeholder="Mustermann" formControlName="lastname" autocomplete="family-name">
+                </ion-input>
+                <ion-note slot="error" *ngIf="(lastname.dirty || lastname.touched) && lastname.errors">Nachname ungültig
+                </ion-note>
+              </ion-item>
+              <ion-button expand="full" type="submit" [disabled]="!name.valid">Weiter</ion-button>
+            </form>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-slide>
+    <ion-slide>
+      <ion-grid>
+        <ion-row class="ion-justify-content-center">
+          <ion-col size="8">
+            <ion-img src="../../assets/svg/signin_01.svg"></ion-img>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <form [formGroup]="address" (ngSubmit)="createProfile()">
+              <ion-item>
+                <ion-button expand="full" (click)="fillLocation()" >Automatisch ausfüllen</ion-button>
+              </ion-item>
+              <ion-item class="ion-margin-bottom">
+                <ion-label position="floating">Adresszeile 1</ion-label>
+                <ion-icon slot="end" name="location"></ion-icon>
+                <ion-input type="text" placeholder="Musterstraße 1a" formControlName="addressline1" autocomplete="address-line1"></ion-input>
+                <ion-note slot="error" *ngIf="(addressline1.dirty || addressline1.touched) && addressline1.errors">Adresszeile 1 ungültig</ion-note>
+              </ion-item>
+              <ion-item class="ion-margin-bottom">
+                <ion-label position="floating">Adresszeile 2</ion-label>
+                <ion-icon slot="end" name="location"></ion-icon>
+                <ion-input type="text" placeholder="Mustermann" formControlName="addressline2" autocomplete="address-line2">
+                </ion-input>
+                <ion-note slot="error" *ngIf="(addressline2.dirty || addressline2.touched) && addressline2.errors">Adresszeile 2 ungültig
+                </ion-note>
+              </ion-item>
+              <ion-item class="ion-margin-bottom">
+                <ion-label position="floating">Postleitzahl</ion-label>
+                <ion-icon slot="end" name="location"></ion-icon>
+                <ion-input type="number" placeholder="54321" formControlName="postalcode" autocomplete="postal-code">
+                </ion-input>
+                <ion-note slot="error" *ngIf="(postalcode.dirty || postalcode.touched) && postalcode.errors">Postleitzahl ungültig
+                </ion-note>
+              </ion-item>
+              <ion-item class="ion-margin-bottom">
+                <ion-label position="floating">Ort</ion-label>
+                <ion-icon slot="end" name="location"></ion-icon>
+                <ion-input type="text" placeholder="Musterstadt" formControlName="city" autocomplete="country-name">
+                </ion-input>
+                <ion-note slot="error" *ngIf="(city.dirty || city.touched) && city.errors">Ort ungültig
+                </ion-note>
+              </ion-item>
+              <ion-button expand="full" type="submit" [disabled]="!address.valid">Weiter</ion-button>
+            </form>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-slide>
+  </ion-slides>
+</ion-content>
+
+<ion-footer>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <!-- <ion-button expand="full" (click)="navigateToSignUp()">Neues Konto erstellen</ion-button> -->
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-footer>
