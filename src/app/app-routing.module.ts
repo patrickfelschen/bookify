@@ -41,6 +41,11 @@ const routes: Routes = [
     ...canActivate(redirectUnauthorizedToSignIn)
   },
   {
+    path: 'bookingservice',
+    loadChildren: () => import('./pages/bookingservice/bookingservice.module').then( m => m.BookingservicePageModule),
+    ...canActivate(redirectUnauthorizedToSignIn)
+  },
+  {
     path: '**',
     redirectTo: 'onboarding',
     pathMatch: 'full'

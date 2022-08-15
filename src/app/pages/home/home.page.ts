@@ -27,7 +27,10 @@ export class HomePage {
   }
 
   bookingOverview() {
-    // this.router.navigate(['/bookingoverview']);
     this.router.navigateByUrl('bookingoverview', {replaceUrl: true});
+  }
+
+  newBooking() {
+    this.router.navigateByUrl('bookingservice', { replaceUrl: true });
   }
 }
