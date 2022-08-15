@@ -2,6 +2,7 @@ import { Component, ViewChild  } from '@angular/core';
 import SwiperCore, { Autoplay, Keyboard, Pagination, Scrollbar, Zoom } from 'swiper';
 import { IonDatetime, IonicSlides, IonSlides } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { AlertController } from '@ionic/angular';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -19,6 +20,7 @@ export class BookingservicePage {
 
   constructor(
     private router: Router,
+    private alertController: AlertController
     ) { }
 
   abort() {
@@ -45,8 +47,29 @@ export class BookingservicePage {
     this.slides.slideNext();
   }
 
-  confirmBooking() {
-    this.router.navigateByUrl('home', { replaceUrl: true });
+  async confirmBooking() {
+    const alert = await this.alertController.create({
+      header: 'Termin speichern?',
+      message: 'Soll der Termin automatisch in den Telefon Kalender übertragen werden?',
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'confirm',
+          handler: () => {
+            this.router.navigateByUrl('home', { replaceUrl: true });
+          }
+        },
+        {
+          text: 'Abbrechen',
+          role: 'cancel',
+          handler: () => {
+            this.router.navigateByUrl('home', { replaceUrl: true });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   calendarChange($event) {
