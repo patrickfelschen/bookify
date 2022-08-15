@@ -8,7 +8,6 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 })
 export class AppComponent {
   constructor() {
-    StatusBar.setOverlaysWebView({ overlay: true });
     StatusBar.setBackgroundColor({color: '#0ca789'});
   }
 }

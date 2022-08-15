@@ -17,7 +17,7 @@
       <ion-grid>
         <ion-row class="ion-justify-content-center">
           <ion-col size="8">
-            <ion-img src="../../assets/svg/signin_01.svg"></ion-img>
+            <ion-img src="../../assets/svg/completeprofile_01.svg"></ion-img>
           </ion-col>
         </ion-row>
         <ion-row>
@@ -48,15 +48,17 @@
       <ion-grid>
         <ion-row class="ion-justify-content-center">
           <ion-col size="8">
-            <ion-img src="../../assets/svg/signin_01.svg"></ion-img>
+            <ion-img src="../../assets/svg/completeprofile_02.svg"></ion-img>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-button expand="full" (click)="fillLocation()" >Automatisch ausfüllen</ion-button>
           </ion-col>
         </ion-row>
         <ion-row>
           <ion-col>
             <form [formGroup]="address" (ngSubmit)="createProfile()">
-              <ion-item>
-                <ion-button expand="full" (click)="fillLocation()" >Automatisch ausfüllen</ion-button>
-              </ion-item>
               <ion-item class="ion-margin-bottom">
                 <ion-label position="floating">Adresszeile 1</ion-label>
                 <ion-icon slot="end" name="location"></ion-icon>
@@ -95,13 +97,3 @@
     </ion-slide>
   </ion-slides>
 </ion-content>
-
-<ion-footer>
-  <ion-grid>
-    <ion-row>
-      <ion-col>
-        <!-- <ion-button expand="full" (click)="navigateToSignUp()">Neues Konto erstellen</ion-button> -->
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-</ion-footer>
