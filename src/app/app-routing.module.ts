@@ -22,7 +22,7 @@ const routes: Routes = [
   },
   {
     path: 'bookingoverview',
-    loadChildren: () => import('./pages/bookingoverview/bookingoverview.module').then( m => m.BookingoverviewPageModule),
+    loadChildren: () => import('./pages/home/bookingoverview/bookingoverview.module').then( m => m.BookingoverviewPageModule),
     ...canActivate(redirectUnauthorizedToSignIn)
   },
   {
@@ -46,8 +46,8 @@ const routes: Routes = [
     ...canActivate(redirectLoggedInToHome)
   },
   {
-    path: 'bookingoverview',
-    loadChildren: () => import('./pages/bookingoverview/bookingoverview.module').then( m => m.BookingoverviewPageModule),
+    path: 'bookingwizard',
+    loadChildren: () => import('./pages/home/bookingwizard/bookingwizard.module').then( m => m.BookingwizardPageModule),
     ...canActivate(redirectUnauthorizedToSignIn)
   },
   {

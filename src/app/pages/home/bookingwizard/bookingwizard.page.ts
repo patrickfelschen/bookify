@@ -7,12 +7,12 @@ import { AlertController } from '@ionic/angular';
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
 @Component({
-  selector: 'app-bookingservice',
-  templateUrl: './bookingservice.page.html',
-  styleUrls: ['./bookingservice.page.scss'],
+  selector: 'app-bookingwizard',
+  templateUrl: './bookingwizard.page.html',
+  styleUrls: ['./bookingwizard.page.scss'],
 })
+export class BookingwizardPage {
 
-export class BookingservicePage {
   @ViewChild('slides') slides: IonSlides;
   @ViewChild('calendar') calendar: IonDatetime;
 

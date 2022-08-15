@@ -6,6 +6,14 @@ const routes: Routes = [
   {
     path: '',
     component: HomePage,
+  },
+  {
+    path: 'booking-creation',
+    loadChildren: () => import('./booking-creation/booking-creation.module').then( m => m.BookingCreationPageModule)
+  },
+  {
+    path: 'bookingwizard',
+    loadChildren: () => import('./bookingwizard/bookingwizard.module').then( m => m.BookingwizardPageModule)
   }
 ];
 

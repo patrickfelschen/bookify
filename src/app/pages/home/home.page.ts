@@ -31,6 +31,6 @@ export class HomePage {
   }
 
   newBooking() {
-    this.router.navigateByUrl('bookingservice', { replaceUrl: true });
+    this.router.navigateByUrl('bookingwizard', { replaceUrl: true });
   }
 }
