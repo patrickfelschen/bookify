@@ -8,13 +8,13 @@ export class UserModel {
   city: string;
 
   constructor(
-    uid,
-    firstname,
-    lastname,
-    addressline1,
-    addressline2,
-    postalcode,
-    city
+    uid = '',
+    firstname = '',
+    lastname = '',
+    addressline1 = '',
+    addressline2 = '',
+    postalcode = '',
+    city = ''
   ) {
     this.uid = uid;
     this.firstname = firstname;
