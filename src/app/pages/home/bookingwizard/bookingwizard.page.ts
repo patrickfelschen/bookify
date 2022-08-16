@@ -10,6 +10,7 @@ import { IonDatetime, IonicSlides, IonSlides } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { FirestoreService } from 'src/app/services/firestore.service';
+import { format, parseISO } from 'date-fns';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -24,16 +25,18 @@ export class BookingwizardPage {
 
   selectedService;
   services = [];
+  providers = [];
   currentSlide = 0;
+  observableProviders;
+  observableServices;
 
   constructor(
     private router: Router,
     private alertController: AlertController,
     private firestoreService: FirestoreService,
   ) {
-    this.firestoreService.getAllServices().subscribe((data) => {
+    this.observableServices = this.firestoreService.getAllServices().subscribe((data) => {
       this.services = data;
-      console.log(data);
     });
   }
 
@@ -47,13 +50,19 @@ export class BookingwizardPage {
   }
 
   chooseProviderSlide(service) {
+    this.observableServices.unsubscribe();
     this.selectedService = service;
-    console.log(this.selectedService);
+    this.observableProviders = (this.firestoreService.getProvidersByService(this.selectedService)).subscribe((data) => {
+      this.providers = data;
+    });
+
     this.currentSlide++;
     this.slides.slideNext();
   }
 
   chooseDateSlide() {
+    this.observableProviders.unsubscribe();
+
     this.currentSlide++;
     this.slides.slideNext();
   }
@@ -89,7 +98,8 @@ export class BookingwizardPage {
     await alert.present();
   }
 
-  calendarChange($event) {
-    console.log(this.calendar.value);
+  calendarChange(value) {
+    const formattedDate = format(parseISO(value), 'HH:mm, MMM dd YYY');
+    console.log(formattedDate);
   }
 }

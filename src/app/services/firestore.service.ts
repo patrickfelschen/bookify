@@ -8,6 +8,7 @@ import {
   docData,
   Firestore,
   getDoc,
+  orderBy,
   query,
   setDoc,
   where,
@@ -22,7 +23,7 @@ export class FirestoreService {
 
   constructor(private auth: Auth, private firestore: Firestore) {
     this.servicesCollection = collection(this.firestore, 'services');
-    this.providersCollection = collection(this.firestore, 'provides');
+    this.providersCollection = collection(this.firestore, 'providers');
   }
 
   getCurrentAuthUser() {
@@ -78,7 +79,7 @@ export class FirestoreService {
   }
 
   getProvidersByService(service){
-    const providerQuery = query(this.providersCollection, where('serviceUids', 'array-contains', service.uid));
+    const providerQuery = query(this.providersCollection, where('serviceUids', 'array-contains', service.uid), orderBy('name', 'asc'));
     return collectionData(providerQuery, {idField: 'uid'});
   }
 

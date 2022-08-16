@@ -53,22 +53,10 @@
                   <h2>Beliebig</h2>
                 </ion-label>
               </ion-item>
-              <ion-item class="booking" lines="full" button (click)="chooseDateSlide()">
+              <ion-item *ngFor="let provider of providers" class="booking" lines="full" button (click)="chooseDateSlide()">
                 <ion-icon name="person" slot="start" color="primary"></ion-icon>
                 <ion-label>
-                  <h2>Patrick Posaune</h2>
-                </ion-label>
-              </ion-item>
-              <ion-item class="booking" lines="full" button (click)="chooseDateSlide()">
-                <ion-icon name="person" slot="start" color="primary"></ion-icon>
-                <ion-label>
-                  <h2>Julian Jagdhorn</h2>
-                </ion-label>
-              </ion-item>
-              <ion-item class="booking" lines="full" button>
-                <ion-icon name="person" slot="start" color="primary"></ion-icon>
-                <ion-label>
-                  <h2>Daniel Dudelsack</h2>
+                  <h2>{{ provider.name }}</h2>
                 </ion-label>
               </ion-item>
             </ion-list>
@@ -85,7 +73,7 @@
         </ion-row>
         <ion-row>
           <ion-col>
-            <ion-datetime #calendar (ionChange)="calendarChange($event)" color="primary" locale="de-DE" presentation="date">
+            <ion-datetime #calendar (ionChange)="calendarChange(calendar.value)" color="primary" locale="de-DE" presentation="date" displayFormat="YYYY">
             </ion-datetime>
           </ion-col>
         </ion-row>
