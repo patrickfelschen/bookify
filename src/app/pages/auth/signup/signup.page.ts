@@ -45,7 +45,7 @@ export class SignupPage implements OnInit {
     await loading.dismiss();
     // Status prüfen
     if(user != null){
-      this.router.navigateByUrl('/home', {replaceUrl: true});
+      this.router.navigateByUrl('completeprofile', {replaceUrl: true});
     } else {
       this.showAlert('Registrierung fehlgeschlagen', 'Versuche es erneut!');
     }

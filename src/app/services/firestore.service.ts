@@ -71,7 +71,7 @@ export class FirestoreService {
   getUserProfile() {
     const authUser = this.getCurrentAuthUser();
     const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
-    return docData(userDocRef);
+    return docData(userDocRef, {idField: 'uid'});
   }
 
   getAllServices() {
