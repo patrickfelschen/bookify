@@ -14,7 +14,7 @@ export class FirestoreService {
     return user;
   }
 
-  async userDocExists() {
+  async userProfileExists() {
     const authUser = this.getCurrentAuthUser();
     const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
     try {
@@ -25,7 +25,7 @@ export class FirestoreService {
     }
   }
 
-  async createUser({
+  async createUserProfile({
     firstname,
     lastname,
     addressline1,
@@ -48,6 +48,17 @@ export class FirestoreService {
     } catch (error) {
       console.log(error);
       return false;
+    }
+  }
+
+  async getUserProfile(){
+    const authUser = this.getCurrentAuthUser();
+    const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
+    try {
+      const docSnap = await getDoc(userDocRef);
+      return docSnap;
+    } catch (error) {
+      return null;
     }
   }
 }

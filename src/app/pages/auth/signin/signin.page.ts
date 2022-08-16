@@ -58,7 +58,7 @@ export class SigninPage implements OnInit {
     // Status prüfen
     if (user != null) {
       // Prüfen ob ein User Profil bereits existiert
-      const userExists = await this.firestoreService.userDocExists();
+      const userExists = await this.firestoreService.userProfileExists();
       if (userExists === true) {
         // Profil existiert
         this.router.navigateByUrl('home', { replaceUrl: true });
