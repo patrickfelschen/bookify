@@ -1,13 +1,25 @@
 import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
-import { doc, docData, Firestore, getDoc, setDoc } from '@angular/fire/firestore';
-import { User } from '../models/user.interface';
+import {
+  collection,
+  collectionData,
+  CollectionReference,
+  doc,
+  docData,
+  Firestore,
+  getDoc,
+  setDoc,
+} from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FirestoreService {
-  constructor(private auth: Auth, private firestore: Firestore) {}
+  servicesCollection: CollectionReference;
+
+  constructor(private auth: Auth, private firestore: Firestore) {
+    this.servicesCollection = collection(this.firestore, 'services');
+  }
 
   getCurrentAuthUser() {
     const user = this.auth.currentUser;
@@ -51,9 +63,13 @@ export class FirestoreService {
     }
   }
 
-  getUserProfile(){
+  getUserProfile() {
     const authUser = this.getCurrentAuthUser();
     const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
     return docData(userDocRef);
+  }
+
+  getAllServices() {
+    return collectionData(this.servicesCollection, {idField: 'uid'});
   }
 }

@@ -1,8 +1,15 @@
-import { Component, ViewChild  } from '@angular/core';
-import SwiperCore, { Autoplay, Keyboard, Pagination, Scrollbar, Zoom } from 'swiper';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import SwiperCore, {
+  Autoplay,
+  Keyboard,
+  Pagination,
+  Scrollbar,
+  Zoom,
+} from 'swiper';
 import { IonDatetime, IonicSlides, IonSlides } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
+import { FirestoreService } from 'src/app/services/firestore.service';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -12,19 +19,24 @@ SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
   styleUrls: ['./bookingwizard.page.scss'],
 })
 export class BookingwizardPage {
-
   @ViewChild('slides') slides: IonSlides;
   @ViewChild('calendar') calendar: IonDatetime;
 
+  services: [];
   currentSlide = 0;
 
   constructor(
     private router: Router,
-    private alertController: AlertController
-    ) { }
+    private alertController: AlertController,
+    private firestoreService: FirestoreService,
+  ) {
+    this.firestoreService.getAllServices().subscribe((data) => {
+      console.log(data);
+    });
+  }
 
   abort() {
-    this.router.navigateByUrl('home', {replaceUrl: true});
+    this.router.navigateByUrl('home', { replaceUrl: true });
   }
 
   back() {
@@ -50,23 +62,24 @@ export class BookingwizardPage {
   async confirmBooking() {
     const alert = await this.alertController.create({
       header: 'Termin speichern?',
-      message: 'Soll der Termin automatisch in den Telefon Kalender übertragen werden?',
+      message:
+        'Soll der Termin automatisch in den Telefon Kalender übertragen werden?',
       buttons: [
         {
           text: 'Ok',
           role: 'confirm',
           handler: () => {
             this.router.navigateByUrl('home', { replaceUrl: true });
-          }
+          },
         },
         {
           text: 'Abbrechen',
           role: 'cancel',
           handler: () => {
             this.router.navigateByUrl('home', { replaceUrl: true });
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
     await alert.present();
