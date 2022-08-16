@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthService } from '../../../services/auth.service';
 import { FirestoreService } from '../../../services/firestore.service';
 import { Router } from '@angular/router';
@@ -10,9 +10,10 @@ import { UserModel } from 'src/app/models/user.interface';
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
 })
-export class ProfilePage implements OnInit {
+export class ProfilePage implements OnInit, OnDestroy {
   mail: string;
   user: UserModel = new UserModel();
+  userObservable;
 
   constructor(
     private authService: AuthService,
@@ -24,9 +25,13 @@ export class ProfilePage implements OnInit {
 
   ngOnInit() {
     this.mail = this.firestoreService.getCurrentAuthUser().email;
-    this.firestoreService.getUserProfile().subscribe(res => {
+    this.userObservable = this.firestoreService.getUserProfile().subscribe(res => {
       this.user = new UserModel('', res.firstname, res.lastname, res.addressline1, res.addressline2, res.postalcode, res.city);
     });
+  }
+
+  ngOnDestroy() {
+    this.userObservable.unsubscribe();
   }
 
   async signOut(){

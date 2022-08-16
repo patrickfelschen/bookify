@@ -10,7 +10,7 @@ import { IonDatetime, IonicSlides, IonSlides } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { FirestoreService } from 'src/app/services/firestore.service';
-import { format, parse, parseISO } from 'date-fns';
+import { format, parseISO,  } from 'date-fns';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -99,7 +99,7 @@ export class BookingwizardPage {
   }
 
   calendarChange(value) {
+    console.log(format(parseISO(value), 'e'));
     const formattedDate = format(parseISO(value), 'HH:mm, MMM dd YYY');
-    console.log(formattedDate);
   }
 }
