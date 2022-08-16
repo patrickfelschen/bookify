@@ -22,7 +22,8 @@ export class BookingwizardPage {
   @ViewChild('slides') slides: IonSlides;
   @ViewChild('calendar') calendar: IonDatetime;
 
-  services: [];
+  selectedService;
+  services = [];
   currentSlide = 0;
 
   constructor(
@@ -31,6 +32,7 @@ export class BookingwizardPage {
     private firestoreService: FirestoreService,
   ) {
     this.firestoreService.getAllServices().subscribe((data) => {
+      this.services = data;
       console.log(data);
     });
   }
@@ -44,7 +46,9 @@ export class BookingwizardPage {
     this.slides.slidePrev();
   }
 
-  chooseProviderSlide() {
+  chooseProviderSlide(service) {
+    this.selectedService = service;
+    console.log(this.selectedService);
     this.currentSlide++;
     this.slides.slideNext();
   }

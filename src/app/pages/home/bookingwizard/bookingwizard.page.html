@@ -26,22 +26,10 @@
         <ion-row>
           <ion-col>
             <ion-list>
-              <ion-item class="booking" lines="full" button (click)="chooseProviderSlide()">
+              <ion-item *ngFor="let service of services" class="booking" lines="full" button (click)="chooseProviderSlide(service)" >
                 <ion-icon name="briefcase" slot="start" color="primary"></ion-icon>
                 <ion-label>
-                  <h2>Hochzeit (bis 50 Pers.)</h2>
-                </ion-label>
-              </ion-item>
-              <ion-item class="booking" lines="full" button (click)="chooseProviderSlide()">
-                <ion-icon name="briefcase" slot="start" color="primary"></ion-icon>
-                <ion-label>
-                  <h2>Hochzeit (bis 100 Pers.)</h2>
-                </ion-label>
-              </ion-item>
-              <ion-item class="booking" lines="full" button (click)="chooseProviderSlide()">
-                <ion-icon name="briefcase" slot="start" color="primary"></ion-icon>
-                <ion-label>
-                  <h2>Hochzeit (ab 100 Pers.)</h2>
+                  <h2>{{ service.description }}</h2>
                 </ion-label>
               </ion-item>
             </ion-list>
