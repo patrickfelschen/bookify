@@ -3,6 +3,7 @@ import { AuthService } from '../../../services/auth.service';
 import { FirestoreService } from '../../../services/firestore.service';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
+import { UserModel } from 'src/app/models/user.interface';
 
 @Component({
   selector: 'app-profile',
@@ -10,7 +11,8 @@ import { LoadingController } from '@ionic/angular';
   styleUrls: ['./profile.page.scss'],
 })
 export class ProfilePage implements OnInit {
-  user = {};
+  mail: string;
+  user: UserModel = new UserModel();
 
   constructor(
     private authService: AuthService,
@@ -18,12 +20,13 @@ export class ProfilePage implements OnInit {
     private loadingController: LoadingController,
     private firestoreService: FirestoreService
     ) {
-      this.firestoreService.getCurrentUserDoc().subscribe(res => {
-        this.user = res;
-      });
     }
 
   ngOnInit() {
+    this.mail = this.firestoreService.getCurrentAuthUser().email;
+    this.firestoreService.getUserProfile().subscribe(res => {
+      this.user = new UserModel('', res.firstname, res.lastname, res.addressline1, res.addressline2, res.postalcode, res.city);
+    });
   }
 
   async signOut(){
