@@ -8,7 +8,6 @@ import {
   docData,
   Firestore,
   getDoc,
-  getDocs,
   orderBy,
   query,
   setDoc,
@@ -80,7 +79,7 @@ export class FirestoreService {
   }
 
   getProvidersByService(service){
-    const providerQuery = query(this.providersCollection, where('serviceUids', 'array-contains', service.uid));
+    const providerQuery = query(this.providersCollection, where('serviceUids', 'array-contains', service.uid), orderBy('name', 'asc'));
     return collectionData(providerQuery, {idField: 'uid'});
   }
 
