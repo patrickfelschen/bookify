@@ -66,7 +66,7 @@ export class FirestoreService {
     const configDocRef = doc(this.firestore, `configs/booking`);
     try {
       const docSnap = await getDoc(configDocRef);
-      return docSnap;
+      return docSnap.data();
     } catch (error) {
       return null;
     }
@@ -81,6 +81,7 @@ export class FirestoreService {
     return collectionData(providerQuery, {idField: 'uid'});
   }
 
+  // TODO: nur aus der zukunft
   getBookingsByProvider(provider) {
     const bookingsCollection = collection(this.firestore, `providers/${provider.uid}/bookings`);
     return collectionData(bookingsCollection, {idField: 'uid'});
