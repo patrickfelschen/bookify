@@ -105,7 +105,7 @@ export class CompleteprofilePage implements OnInit {
     const loading = await this.loadingController.create();
 
     // Firestore call
-    const result = await this.firestoreService.createUser({
+    const result = await this.firestoreService.createUserProfile({
       firstname: this.firstname.value,
       lastname: this.lastname.value,
       addressline1: this.addressline1.value,
