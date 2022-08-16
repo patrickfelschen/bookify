@@ -8,6 +8,8 @@ import {
   docData,
   Firestore,
   getDoc,
+  getDocs,
+  orderBy,
   query,
   setDoc,
   where,
@@ -22,7 +24,7 @@ export class FirestoreService {
 
   constructor(private auth: Auth, private firestore: Firestore) {
     this.servicesCollection = collection(this.firestore, 'services');
-    this.providersCollection = collection(this.firestore, 'provides');
+    this.providersCollection = collection(this.firestore, 'providers');
   }
 
   getCurrentAuthUser() {
@@ -70,7 +72,7 @@ export class FirestoreService {
   getUserProfile() {
     const authUser = this.getCurrentAuthUser();
     const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
-    return docData(userDocRef);
+    return docData(userDocRef, {idField: 'uid'});
   }
 
   getAllServices() {
