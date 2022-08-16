@@ -16,9 +16,11 @@ import {
 })
 export class FirestoreService {
   servicesCollection: CollectionReference;
+  providersCollection: CollectionReference;
 
   constructor(private auth: Auth, private firestore: Firestore) {
     this.servicesCollection = collection(this.firestore, 'services');
+    this.providersCollection = collection(this.firestore, 'provides');
   }
 
   getCurrentAuthUser() {
@@ -72,4 +74,6 @@ export class FirestoreService {
   getAllServices() {
     return collectionData(this.servicesCollection, {idField: 'uid'});
   }
+
+
 }
