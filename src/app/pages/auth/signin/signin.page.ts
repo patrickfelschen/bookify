@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
+import { FirestoreService } from 'src/app/services/firestore.service';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
@@ -17,6 +18,7 @@ export class SigninPage implements OnInit {
     private loadingController: LoadingController,
     private alertController: AlertController,
     private authService: AuthService,
+    private firestoreService: FirestoreService,
     private router: Router
   ) {}
 
@@ -31,18 +33,16 @@ export class SigninPage implements OnInit {
   ngOnInit() {
     this.credentials = this.fb.group({
       email: [
-        '', [
-          Validators.required,
-          Validators.maxLength(30),
-          Validators.email
-        ]
+        '',
+        [Validators.required, Validators.maxLength(30), Validators.email],
       ],
       password: [
-        '', [
+        '',
+        [
           Validators.required,
           Validators.minLength(10),
-          Validators.maxLength(40)
-        ]
+          Validators.maxLength(40),
+        ],
       ],
     });
   }
@@ -57,7 +57,15 @@ export class SigninPage implements OnInit {
     await loading.dismiss();
     // Status prüfen
     if (user != null) {
-      this.router.navigateByUrl('completeprofile', { replaceUrl: true });
+      // Prüfen ob ein User Profil bereits existiert
+      const userExists = await this.firestoreService.userDocExists();
+      if (userExists === true) {
+        // Profil existiert
+        this.router.navigateByUrl('home', { replaceUrl: true });
+      } else {
+        // Profil muss erstellt werden
+        this.router.navigateByUrl('completeprofile', { replaceUrl: true });
+      }
     } else {
       this.showAlert('Anmeldung fehlgeschlagen', 'Versuche es erneut!');
     }

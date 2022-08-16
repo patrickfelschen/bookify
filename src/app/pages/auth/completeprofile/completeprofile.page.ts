@@ -2,10 +2,17 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AlertController, IonSlides, LoadingController } from '@ionic/angular';
-import SwiperCore, { Autoplay, Keyboard, Pagination, Scrollbar, Zoom } from 'swiper';
+import SwiperCore, {
+  Autoplay,
+  Keyboard,
+  Pagination,
+  Scrollbar,
+  Zoom,
+} from 'swiper';
 import { IonicSlides } from '@ionic/angular';
 import { AuthService } from '../../../services/auth.service';
 import { LocationService } from 'src/app/services/location.service';
+import { FirestoreService } from 'src/app/services/firestore.service';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -25,8 +32,9 @@ export class CompleteprofilePage implements OnInit {
     private loadingController: LoadingController,
     private alertController: AlertController,
     private authService: AuthService,
+    private firestoreService: FirestoreService,
     private locationService: LocationService,
-    private router: Router,
+    private router: Router
   ) {}
 
   get firstname() {
@@ -55,61 +63,34 @@ export class CompleteprofilePage implements OnInit {
 
   ngOnInit() {
     this.name = this.fb.group({
-      firstname: [
-        '', [
-          Validators.required,
-          Validators.maxLength(30),
-        ],
-      ],
-      lastname: [
-        '', [
-          Validators.required,
-          Validators.maxLength(30),
-        ],
-      ],
+      firstname: ['', [Validators.required, Validators.maxLength(30)]],
+      lastname: ['', [Validators.required, Validators.maxLength(30)]],
     });
 
     this.address = this.fb.group({
-      addressline1: [
-        '', [
-          Validators.required,
-          Validators.maxLength(30),
-        ],
-      ],
-      addressline2: [
-        '', [
-          Validators.maxLength(30),
-        ],
-      ],
-      postalcode: [
-        '', [
-          Validators.required,
-          Validators.maxLength(5),
-        ],
-      ],
-      city: [
-        '', [
-          Validators.required,
-          Validators.maxLength(30),
-        ],
-      ]
+      addressline1: ['', [Validators.required, Validators.maxLength(30)]],
+      addressline2: ['', [Validators.maxLength(30)]],
+      postalcode: ['', [Validators.required, Validators.maxLength(5)]],
+      city: ['', [Validators.required, Validators.maxLength(30)]],
     });
   }
 
-  async signOut(){
+  async signOut() {
     // Ladeanzeige anzeigen
     const loading = await this.loadingController.create();
     await this.authService.signOut();
     // Ladeanzeige verstecken
     await loading.dismiss();
-    this.router.navigateByUrl('signin', {replaceUrl: true});
+    this.router.navigateByUrl('signin', { replaceUrl: true });
   }
 
   async fillLocation() {
     const loading = await this.loadingController.create();
     const result = await this.locationService.getCurrentAddress();
 
-    this.addressline1.setValue(result.thoroughfare + ' ' + result.subThoroughfare);
+    this.addressline1.setValue(
+      result.thoroughfare + ' ' + result.subThoroughfare
+    );
     this.postalcode.setValue(result.postalCode);
     this.city.setValue(result.locality);
 
@@ -122,9 +103,38 @@ export class CompleteprofilePage implements OnInit {
 
   async createProfile() {
     const loading = await this.loadingController.create();
+
     // Firestore call
+    const result = await this.firestoreService.createUser({
+      firstname: this.firstname.value,
+      lastname: this.lastname.value,
+      addressline1: this.addressline1.value,
+      addressline2: this.addressline2.value,
+      postalcode: this.postalcode.value,
+      city: this.city.value,
+    });
+
     await loading.dismiss();
-    this.router.navigateByUrl('home', {replaceUrl: true});
+
+    if (result === false) {
+      this.showAlert('Firestore', 'Es ist ein Fehler aufgetreten!');
+    }
+
+    this.router.navigateByUrl('home', { replaceUrl: true });
   }
 
+  /**
+   * Zeigt eine Alert Nachricht
+   *
+   * @param header Überschrift Zeichenkette
+   * @param message Nachricht Zeichenkette
+   */
+  async showAlert(header: string, message: string) {
+    const alert = await this.alertController.create({
+      header,
+      message,
+      buttons: ['OK'],
+    });
+    await alert.present();
+  }
 }
