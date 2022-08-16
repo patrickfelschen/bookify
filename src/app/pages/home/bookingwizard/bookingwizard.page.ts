@@ -19,16 +19,20 @@ SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
   templateUrl: './bookingwizard.page.html',
   styleUrls: ['./bookingwizard.page.scss'],
 })
-export class BookingwizardPage {
+export class BookingwizardPage implements OnInit {
   @ViewChild('slides') slides: IonSlides;
   @ViewChild('calendar') calendar: IonDatetime;
 
   selectedService;
+  selectedProvider;
   services = [];
   providers = [];
+  bookings = [];
   currentSlide = 0;
   observableProviders;
   observableServices;
+  observableBookings;
+  bookingConfig;
 
   constructor(
     private router: Router,
@@ -38,6 +42,10 @@ export class BookingwizardPage {
     this.observableServices = this.firestoreService.getAllServices().subscribe((data) => {
       this.services = data;
     });
+  }
+
+  async ngOnInit() {
+    this.bookingConfig = await this.firestoreService.getBookingConfig();
   }
 
   abort() {
@@ -55,19 +63,25 @@ export class BookingwizardPage {
     this.observableProviders = (this.firestoreService.getProvidersByService(this.selectedService)).subscribe((data) => {
       this.providers = data;
     });
-
     this.currentSlide++;
     this.slides.slideNext();
   }
 
-  chooseDateSlide() {
+  async chooseDateSlide(provider) {
     this.observableProviders.unsubscribe();
-
+    this.selectedProvider = provider;
+    if(provider === null) {
+      // Beliebig
+    }
+    this.observableBookings = (this.firestoreService.getBookingsByProvider(this.selectedProvider)).subscribe((data) => {
+      this.bookings = data;
+    });
     this.currentSlide++;
     this.slides.slideNext();
   }
 
   confirmSlide() {
+    this.observableBookings.unsubscribe();
     this.currentSlide++;
     this.slides.slideNext();
   }
@@ -98,8 +112,37 @@ export class BookingwizardPage {
     await alert.present();
   }
 
+  getSlotsOfWeekDay(weekDay) {
+    let slots;
+    switch (weekDay) {
+      case '1':
+        slots = this.bookingConfig.sun;
+        break;
+      case '2':
+        slots = this.bookingConfig.mon;
+        break;
+      case '3':
+        slots = this.bookingConfig.tue;
+        break;
+      case '4':
+        slots = this.bookingConfig.wed;
+        break;
+      case '5':
+        slots = this.bookingConfig.thu;
+        break;
+      case '6':
+        slots = this.bookingConfig.fri;
+        break;
+      case '7':
+        slots = this.bookingConfig.sat;
+        break;
+    }
+    return slots;
+  }
+
   calendarChange(value) {
-    console.log(format(parseISO(value), 'e'));
-    const formattedDate = format(parseISO(value), 'HH:mm, MMM dd YYY');
+    const weekDay = format(parseISO(value), 'e');
+    const weekSlots = this.getSlotsOfWeekDay(weekDay);
+    console.log(weekSlots);
   }
 }
