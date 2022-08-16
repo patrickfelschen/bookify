@@ -78,8 +78,8 @@ export class FirestoreService {
   }
 
   getProvidersByService(service){
-    const q = query(this.providersCollection, where('serviceUids', 'array-contains', service.uid));
-    return q;
+    const providerQuery = query(this.providersCollection, where('serviceUids', 'array-contains', service.uid));
+    return collectionData(providerQuery, {idField: 'uid'});
   }
 
 }
