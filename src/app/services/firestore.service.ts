@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 import {
+  addDoc,
   collection,
   collectionData,
   CollectionReference,
@@ -12,6 +13,7 @@ import {
   query,
   setDoc,
   where,
+  writeBatch,
 } from '@angular/fire/firestore';
 
 @Injectable({
@@ -42,25 +44,11 @@ export class FirestoreService {
     }
   }
 
-  async createUserProfile({
-    firstname,
-    lastname,
-    addressline1,
-    addressline2,
-    postalcode,
-    city,
-  }) {
+  async createUserProfile(user) {
     const authUser = this.getCurrentAuthUser();
     const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
     try {
-      await setDoc(userDocRef, {
-        firstname,
-        lastname,
-        addressline1,
-        addressline2,
-        postalcode,
-        city,
-      });
+      await setDoc(userDocRef, user);
       return true;
     } catch (error) {
       console.log(error);
@@ -74,13 +62,41 @@ export class FirestoreService {
     return docData(userDocRef, {idField: 'uid'});
   }
 
+  async getBookingConfig() {
+    const configDocRef = doc(this.firestore, `configs/booking`);
+    try {
+      const docSnap = await getDoc(configDocRef);
+      return docSnap;
+    } catch (error) {
+      return null;
+    }
+  }
+
   getAllServices() {
     return collectionData(this.servicesCollection, {idField: 'uid'});
   }
 
-  getProvidersByService(service){
+  getProvidersByService(service) {
     const providerQuery = query(this.providersCollection, where('serviceUids', 'array-contains', service.uid), orderBy('name', 'asc'));
     return collectionData(providerQuery, {idField: 'uid'});
+  }
+
+  getBookingsByProvider(provider) {
+    const bookingsCollection = collection(this.firestore, `providers/${provider.uid}/bookings`);
+    return collectionData(bookingsCollection, {idField: 'uid'});
+  }
+
+  async createBooking(booking) {
+    const authUser = this.getCurrentAuthUser();
+    const userBookingsCollection = collection(this.firestore, `users/${authUser.uid}/bookings`);
+    const providerBookingsCollection = collection(this.firestore, `providers/${booking.provider.uid}/bookings`);
+    try {
+      await addDoc(userBookingsCollection, booking);
+      await addDoc(providerBookingsCollection, booking.date);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
 }
