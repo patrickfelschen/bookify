@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../services/auth.service';
+import { FirestoreService } from '../../../services/firestore.service';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-
 
 @Component({
   selector: 'app-profile',
@@ -10,12 +10,18 @@ import { LoadingController } from '@ionic/angular';
   styleUrls: ['./profile.page.scss'],
 })
 export class ProfilePage implements OnInit {
+  user = {};
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private loadingController: LoadingController
-    ) { }
+    private loadingController: LoadingController,
+    private firestoreService: FirestoreService
+    ) {
+      this.firestoreService.getCurrentUserDoc().subscribe(res => {
+        this.user = res;
+      });
+    }
 
   ngOnInit() {
   }

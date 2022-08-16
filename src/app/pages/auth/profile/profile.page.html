@@ -1,9 +1,58 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>profile</ion-title>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home" color="light"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Bookify</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
+  <ion-grid>
+    <ion-row class="ion-justify-content-center ion-margin-vertical">
+      <ion-col size="10">
+        <ion-img src="../../../assets/svg/profile.svg"></ion-img>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item lines="none">
+          <ion-icon name="mail" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h2></h2>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item lines="none">
+          <ion-icon name="person" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h2>{{ this.user.firstname }} {{ this.user.lastname }}</h2>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item lines="none">
+          <ion-icon name="home" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h2>{{ this.user.addressline1 }}</h2>
+            <h2>{{ this.user.postalcode }} {{ this.user.city }}</h2>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
+<ion-footer>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-button color="secondary" expand="full" (click)="signOut()">Abmelden</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-footer>
