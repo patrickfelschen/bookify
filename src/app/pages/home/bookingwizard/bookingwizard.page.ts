@@ -33,6 +33,7 @@ export class BookingwizardPage implements OnInit {
   observableServices;
   observableBookings;
   bookingConfig;
+  weekSlots = [];
 
   constructor(
     private router: Router,
@@ -142,7 +143,7 @@ export class BookingwizardPage implements OnInit {
 
   calendarChange(value) {
     const weekDay = format(parseISO(value), 'e');
-    const weekSlots = this.getSlotsOfWeekDay(weekDay);
-    console.log(weekSlots);
+    this.weekSlots = this.getSlotsOfWeekDay(weekDay);
+    console.log(this.weekSlots);
   }
 }
