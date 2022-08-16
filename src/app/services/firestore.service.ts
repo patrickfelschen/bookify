@@ -8,7 +8,9 @@ import {
   docData,
   Firestore,
   getDoc,
+  query,
   setDoc,
+  where,
 } from '@angular/fire/firestore';
 
 @Injectable({
@@ -75,5 +77,9 @@ export class FirestoreService {
     return collectionData(this.servicesCollection, {idField: 'uid'});
   }
 
+  getProvidersByService(service){
+    const q = query(this.providersCollection, where('serviceUids', 'array-contains', service.uid));
+    return q;
+  }
 
 }
