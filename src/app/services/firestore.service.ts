@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
-import { doc, Firestore, getDoc, setDoc } from '@angular/fire/firestore';
+import { doc, docData, Firestore, getDoc, setDoc } from '@angular/fire/firestore';
 import { User } from '../models/user.interface';
 
 @Injectable({
@@ -51,14 +51,9 @@ export class FirestoreService {
     }
   }
 
-  async getUserProfile(){
+  getUserProfile(){
     const authUser = this.getCurrentAuthUser();
     const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
-    try {
-      const docSnap = await getDoc(userDocRef);
-      return docSnap;
-    } catch (error) {
-      return null;
-    }
+    return docData(userDocRef);
   }
 }
