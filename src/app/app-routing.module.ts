@@ -51,10 +51,15 @@ const routes: Routes = [
     ...canActivate(redirectUnauthorizedToSignIn)
   },
   {
+    path: 'profile',
+    loadChildren: () => import('./pages/auth/profile/profile.module').then( m => m.ProfilePageModule),
+    ...canActivate(redirectUnauthorizedToSignIn)
+  },
+  {
     path: '**',
     redirectTo: 'onboarding',
     pathMatch: 'full'
-  }
+  },
 ];
 
 @NgModule({
