@@ -11,6 +11,10 @@ import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { format, parseISO } from 'date-fns';
+import { ProviderModel } from 'src/app/models/provider.model';
+import { Subscription } from 'rxjs';
+import { ServiceModel } from 'src/app/models/service.mode';
+import { BookingConfigModel } from 'src/app/models/bookingconfig.model';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -23,32 +27,30 @@ export class BookingwizardPage implements OnInit {
   @ViewChild('slides') slides: IonSlides;
   @ViewChild('calendar') calendar: IonDatetime;
 
-  selectedService;
-  selectedProvider;
+  selectedService: ServiceModel;
+  selectedProvider: ProviderModel;
   services = [];
   providers = [];
-  bookings = [];
   currentSlide = 0;
-  observableProviders;
-  observableServices;
-  observableBookings;
-  bookingConfig;
-  dayTimeSlots = [];
+  observableProviders: Subscription;
+  observableServices: Subscription;
+  observableBookings: Subscription;
+  bookingConfig: BookingConfigModel;
+  openSlots = [];
 
   constructor(
     private router: Router,
     private alertController: AlertController,
     private firestoreService: FirestoreService
-  ) {
-    this.observableServices = this.firestoreService
-      .streamAllServices()
-      .subscribe((data) => {
-        this.services = data;
-      });
-  }
+  ) { }
 
   async ngOnInit() {
     this.bookingConfig = await this.firestoreService.getBookingConfig();
+    this.observableServices = this.firestoreService
+    .streamAllServices()
+    .subscribe((data) => {
+      this.services = data;
+    });
   }
 
   abort() {
@@ -60,7 +62,7 @@ export class BookingwizardPage implements OnInit {
     this.slides.slidePrev();
   }
 
-  chooseProviderSlide(service) {
+  chooseProviderSlide(service: ServiceModel) {
     this.observableServices.unsubscribe();
     this.selectedService = service;
     this.observableProviders = this.firestoreService
@@ -72,7 +74,7 @@ export class BookingwizardPage implements OnInit {
     this.slides.slideNext();
   }
 
-  async chooseDateSlide(provider) {
+  async chooseDateSlide(provider: ProviderModel) {
     this.observableProviders.unsubscribe();
     if (provider === null) {
       // Beliebig
@@ -83,7 +85,7 @@ export class BookingwizardPage implements OnInit {
   }
 
   confirmSlide() {
-    //this.observableBookings.unsubscribe();
+    this.observableBookings.unsubscribe();
     this.currentSlide++;
     this.slides.slideNext();
   }
@@ -114,7 +116,7 @@ export class BookingwizardPage implements OnInit {
     await alert.present();
   }
 
-  getSlotsOfWeekDay(weekDay) {
+  getSlotsOfWeekDay(weekDay: string) {
     let slots;
     switch (weekDay) {
       case '1':
@@ -146,7 +148,7 @@ export class BookingwizardPage implements OnInit {
     const dateTime = parseISO(value);
     const date = format(dateTime, 'yyyy-MM-dd');
     const weekDay = format(dateTime, 'e');
-    this.dayTimeSlots = this.getSlotsOfWeekDay(weekDay);
+    const dayTimeSlots = this.getSlotsOfWeekDay(weekDay);
 
     if (this.observableBookings) {
       this.observableBookings.unsubscribe();
@@ -155,10 +157,9 @@ export class BookingwizardPage implements OnInit {
     this.observableBookings = this.firestoreService
       .streamBookingsByProvider(this.selectedProvider, new Date(date))
       .subscribe((data) => {
-        this.bookings = data;
+        //TODO:
+        console.log(data);
       });
-
-    console.log(this.bookings);
     console.log(date);
   }
 }
