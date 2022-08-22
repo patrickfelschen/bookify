@@ -9,6 +9,7 @@ import {
   docData,
   Firestore,
   getDoc,
+  getDocs,
   orderBy,
   query,
   setDoc,
@@ -59,7 +60,7 @@ export class FirestoreService {
   getUserProfile() {
     const authUser = this.getCurrentAuthUser();
     const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
-    return docData(userDocRef, {idField: 'uid'});
+    return docData(userDocRef, { idField: 'uid' });
   }
 
   async getBookingConfig() {
@@ -73,24 +74,40 @@ export class FirestoreService {
   }
 
   getAllServices() {
-    return collectionData(this.servicesCollection, {idField: 'uid'});
+    return collectionData(this.servicesCollection, { idField: 'uid' });
   }
 
   getProvidersByService(service) {
-    const providerQuery = query(this.providersCollection, where('serviceUids', 'array-contains', service.uid), orderBy('name', 'asc'));
-    return collectionData(providerQuery, {idField: 'uid'});
+    const providerQuery = query(
+      this.providersCollection,
+      where('serviceUids', 'array-contains', service.uid),
+      orderBy('name', 'asc')
+    );
+    return collectionData(providerQuery, { idField: 'uid' });
   }
 
-  // TODO: nur aus der zukunft
-  getBookingsByProvider(provider) {
+  async getBookingsByProvider(provider, date) {
     const bookingsCollection = collection(this.firestore, `providers/${provider.uid}/bookings`);
-    return collectionData(bookingsCollection, {idField: 'uid'});
+    const bookingsQuery = query(
+      bookingsCollection,
+      //where('provider.uid', '==', provider.uid),
+      where('date.start', '>=', date),
+      //orderBy('date.start', 'asc')
+    );
+    const querySnap = await getDocs(bookingsQuery); // ?????
+    return querySnap.docs;
   }
 
   async createBooking(booking) {
     const authUser = this.getCurrentAuthUser();
-    const userBookingsCollection = collection(this.firestore, `users/${authUser.uid}/bookings`);
-    const providerBookingsCollection = collection(this.firestore, `providers/${booking.provider.uid}/bookings`);
+    const userBookingsCollection = collection(
+      this.firestore,
+      `users/${authUser.uid}/bookings`
+    );
+    const providerBookingsCollection = collection(
+      this.firestore,
+      `providers/${booking.provider.uid}/bookings`
+    );
     try {
       await addDoc(userBookingsCollection, booking);
       await addDoc(providerBookingsCollection, booking.date);
@@ -99,5 +116,4 @@ export class FirestoreService {
       return false;
     }
   }
-
 }

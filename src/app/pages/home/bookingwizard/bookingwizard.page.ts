@@ -33,7 +33,7 @@ export class BookingwizardPage implements OnInit {
   observableServices;
   observableBookings;
   bookingConfig;
-  weekSlots = [];
+  dayTimeSlots = [];
 
   constructor(
     private router: Router,
@@ -70,19 +70,16 @@ export class BookingwizardPage implements OnInit {
 
   async chooseDateSlide(provider) {
     this.observableProviders.unsubscribe();
-    this.selectedProvider = provider;
     if(provider === null) {
       // Beliebig
     }
-    this.observableBookings = (this.firestoreService.getBookingsByProvider(this.selectedProvider)).subscribe((data) => {
-      this.bookings = data;
-    });
+    this.selectedProvider = provider;
     this.currentSlide++;
     this.slides.slideNext();
   }
 
   confirmSlide() {
-    this.observableBookings.unsubscribe();
+    //this.observableBookings.unsubscribe();
     this.currentSlide++;
     this.slides.slideNext();
   }
@@ -141,9 +138,15 @@ export class BookingwizardPage implements OnInit {
     return slots;
   }
 
-  calendarChange(value) {
-    const weekDay = format(parseISO(value), 'e');
-    this.weekSlots = this.getSlotsOfWeekDay(weekDay);
-    console.log(this.weekSlots);
+  async calendarChange(value) {
+    const dateTime = parseISO(value);
+    const date = format(dateTime, 'yyyy-MM-dd');
+    const weekDay = format(dateTime, 'e');
+    this.dayTimeSlots = this.getSlotsOfWeekDay(weekDay);
+
+    const bookings = await this.firestoreService.getBookingsByProvider(this.selectedProvider, new Date(date));
+
+    console.log(bookings);
+    console.log(date);
   }
 }
