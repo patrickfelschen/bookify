@@ -11,6 +11,10 @@ import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { format, parseISO } from 'date-fns';
+import { ProviderModel } from 'src/app/models/provider.model';
+import { Subscription } from 'rxjs';
+import { ServiceModel } from 'src/app/models/service.mode';
+import { BookingConfigModel } from 'src/app/models/bookingconfig.model';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -23,33 +27,30 @@ export class BookingwizardPage implements OnInit {
   @ViewChild('slides') slides: IonSlides;
   @ViewChild('calendar') calendar: IonDatetime;
 
-  selectedService;
-  selectedProvider;
-  services = [];
-  providers = [];
-  bookings = [];
+  selectedService: ServiceModel;
+  selectedProvider: ProviderModel;
+  services: ServiceModel[] = [];
+  providers: ProviderModel[] = [];
   currentSlide = 0;
-  observableProviders;
-  observableServices;
-  observableBookings;
-  bookingConfig;
-  dayTimeSlots = [];
+  observableProviders: Subscription;
+  observableServices: Subscription;
+  observableBookings: Subscription;
+  bookingConfig: BookingConfigModel;
   availableSlots = [];
 
   constructor(
     private router: Router,
     private alertController: AlertController,
     private firestoreService: FirestoreService
-  ) {
-    this.observableServices = this.firestoreService
-      .streamAllServices()
-      .subscribe((data) => {
-        this.services = data;
-      });
-  }
+  ) { }
 
   async ngOnInit() {
     this.bookingConfig = await this.firestoreService.getBookingConfig();
+    this.observableServices = this.firestoreService
+    .streamAllServices()
+    .subscribe((data) => {
+      this.services = data;
+    });
   }
 
   abort() {
@@ -61,7 +62,7 @@ export class BookingwizardPage implements OnInit {
     this.slides.slidePrev();
   }
 
-  chooseProviderSlide(service) {
+  chooseProviderSlide(service: ServiceModel) {
     this.observableServices.unsubscribe();
     this.selectedService = service;
     this.observableProviders = this.firestoreService
@@ -73,7 +74,7 @@ export class BookingwizardPage implements OnInit {
     this.slides.slideNext();
   }
 
-  async chooseDateSlide(provider) {
+  async chooseDateSlide(provider: ProviderModel) {
     this.observableProviders.unsubscribe();
     if (provider === null) {
       // Beliebig
@@ -84,7 +85,7 @@ export class BookingwizardPage implements OnInit {
   }
 
   confirmSlide() {
-    //this.observableBookings.unsubscribe();
+    this.observableBookings.unsubscribe();
     this.currentSlide++;
     this.slides.slideNext();
   }
@@ -115,7 +116,7 @@ export class BookingwizardPage implements OnInit {
     await alert.present();
   }
 
-  getSlotsOfWeekDay(weekDay) {
+  getSlotsOfWeekDay(weekDay: string) {
     let slots;
     switch (weekDay) {
       case '1':
@@ -147,22 +148,20 @@ export class BookingwizardPage implements OnInit {
     const dateTime = parseISO(value);
     const date = format(dateTime, 'yyyy-MM-dd');
     const weekDay = format(dateTime, 'e');
-    this.dayTimeSlots = this.getSlotsOfWeekDay(weekDay);
+    const dayTimeSlots = this.getSlotsOfWeekDay(weekDay);
 
     if (this.observableBookings) {
       this.observableBookings.unsubscribe();
-      this.bookings = [];
     }
 
     this.observableBookings = this.firestoreService
       .streamBookingsByProvider(this.selectedProvider, new Date(date))
-      .subscribe((data) => {
+      .subscribe((bookings) => {
         this.availableSlots = [];
-        this.bookings = data;
 
-        if(this.bookings.length) {
-          for(const booking of this.bookings) {
-            for(const dayTimeSlot of this.dayTimeSlots) {
+        if(bookings.length) {
+          for(const booking of bookings) {
+            for(const dayTimeSlot of dayTimeSlots) {
               const timestamp = new Date(date + ' ' + dayTimeSlot).getTime() / 1000;
               if(timestamp < booking.date.start.seconds || timestamp > booking.date.end.seconds) {
                 this.availableSlots.push(dayTimeSlot);
@@ -171,7 +170,7 @@ export class BookingwizardPage implements OnInit {
           }
         }
         else {
-          this.availableSlots = this.dayTimeSlots;
+          this.availableSlots = dayTimeSlots;
         }
         this.availableSlots = this.filterDuration(date);
       });
@@ -209,9 +208,4 @@ export class BookingwizardPage implements OnInit {
     return final;
   }
 
-  checkNextDay(slots) {
-    let consecutiveSlots = slots;
-
-
-  }
 }

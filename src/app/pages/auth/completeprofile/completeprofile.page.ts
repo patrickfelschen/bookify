@@ -13,6 +13,7 @@ import { IonicSlides } from '@ionic/angular';
 import { AuthService } from '../../../services/auth.service';
 import { LocationService } from 'src/app/services/location.service';
 import { FirestoreService } from 'src/app/services/firestore.service';
+import { UserModel } from 'src/app/models/user.model';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -103,23 +104,19 @@ export class CompleteprofilePage implements OnInit {
 
   async createProfile() {
     const loading = await this.loadingController.create();
-
-    // Firestore call
-    const result = await this.firestoreService.createUserProfile({
-      firstname: this.firstname.value,
-      lastname: this.lastname.value,
-      addressline1: this.addressline1.value,
-      addressline2: this.addressline2.value,
-      postalcode: this.postalcode.value,
-      city: this.city.value,
-    });
-
+    const userModel = new UserModel(
+      this.firstname.value,
+      this.lastname.value,
+      this.addressline1.value,
+      this.addressline2.value,
+      this.postalcode.value,
+      this.city.value
+    );
+    const result = await this.firestoreService.createUserProfile(userModel);
     await loading.dismiss();
-
     if (result === false) {
       this.showAlert('Firestore', 'Es ist ein Fehler aufgetreten!');
     }
-
     this.router.navigateByUrl('home', { replaceUrl: true });
   }
 

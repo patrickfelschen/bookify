@@ -9,34 +9,40 @@ import {
   docData,
   Firestore,
   getDoc,
-  getDocs,
   orderBy,
   query,
   setDoc,
   where,
-  writeBatch,
 } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
+import { BookingModel, bookingModelConverter } from '../models/booking.model';
+import { BookingConfigModel, bookingConfigModelConverter } from '../models/bookingconfig.model';
+import { DateRangeModel } from '../models/daterange.model';
+import { ProviderModel, providerModelConverter } from '../models/provider.model';
+import { ServiceModel, serviceModelConverter } from '../models/service.mode';
+import { UserModel, userModelConverter } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FirestoreService {
-  servicesCollection: CollectionReference;
-  providersCollection: CollectionReference;
+  private usersCollection: CollectionReference<UserModel>;
+  private servicesCollection: CollectionReference<ServiceModel>;
+  private providersCollection: CollectionReference<ProviderModel>;
 
   constructor(private auth: Auth, private firestore: Firestore) {
-    this.servicesCollection = collection(this.firestore, 'services');
-    this.providersCollection = collection(this.firestore, 'providers');
+    this.usersCollection = collection(this.firestore, 'users').withConverter(userModelConverter);
+    this.servicesCollection = collection(this.firestore, 'services').withConverter(serviceModelConverter);
+    this.providersCollection = collection(this.firestore, 'providers').withConverter(providerModelConverter);
   }
 
   getCurrentAuthUser() {
-    const user = this.auth.currentUser;
-    return user;
+    return this.auth.currentUser;
   }
 
   async userProfileExists() {
     const authUser = this.getCurrentAuthUser();
-    const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
+    const userDocRef = doc(this.usersCollection, authUser.uid);
     try {
       const docSnap = await getDoc(userDocRef);
       return docSnap.exists();
@@ -45,9 +51,9 @@ export class FirestoreService {
     }
   }
 
-  async createUserProfile(user) {
+  async createUserProfile(user: UserModel) {
     const authUser = this.getCurrentAuthUser();
-    const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
+    const userDocRef = doc(this.usersCollection, authUser.uid);
     try {
       await setDoc(userDocRef, user);
       return true;
@@ -57,14 +63,14 @@ export class FirestoreService {
     }
   }
 
-  streamUserProfile() {
+  streamUserProfile(): Observable<UserModel> {
     const authUser = this.getCurrentAuthUser();
-    const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
+    const userDocRef = doc(this.usersCollection, authUser.uid);
     return docData(userDocRef, { idField: 'uid' });
   }
 
-  async getBookingConfig() {
-    const configDocRef = doc(this.firestore, `configs/booking`);
+  async getBookingConfig(): Promise<BookingConfigModel> {
+    const configDocRef = doc(this.firestore, `configs/booking`).withConverter(bookingConfigModelConverter);
     try {
       const docSnap = await getDoc(configDocRef);
       return docSnap.data();
@@ -73,11 +79,11 @@ export class FirestoreService {
     }
   }
 
-  streamAllServices() {
+  streamAllServices(): Observable<ServiceModel[]> {
     return collectionData(this.servicesCollection, { idField: 'uid' });
   }
 
-  streamProvidersByService(service) {
+  streamProvidersByService(service: ServiceModel): Observable<ProviderModel[]> {
     const providerQuery = query(
       this.providersCollection,
       where('serviceUids', 'array-contains', service.uid),
@@ -86,18 +92,19 @@ export class FirestoreService {
     return collectionData(providerQuery, { idField: 'uid' });
   }
 
-  streamBookingsByProvider(provider, date) {
-    const bookingsCollection = collection(this.firestore, `providers/${provider.uid}/bookings`);
+  streamBookingsByProvider(provider: ProviderModel, start: Date): Observable<BookingModel[]> {
+    const bookingsCollection = collection(
+      this.firestore,
+      `providers/${provider.uid}/bookings`
+    ).withConverter(bookingModelConverter);
     const bookingsQuery = query(
       bookingsCollection,
-      //where('provider.uid', '==', provider.uid),
-      where('date.start', '>=', date),
-      //orderBy('date.start', 'asc')
+      where('date.start', '>=', start)
     );
-    return collectionData(bookingsQuery, {idField: 'uid'});
+    return collectionData(bookingsQuery, { idField: 'uid' });
   }
 
-  async createBooking(booking) {
+  async createBooking(booking: BookingModel) {
     const authUser = this.getCurrentAuthUser();
     const userBookingsCollection = collection(
       this.firestore,
