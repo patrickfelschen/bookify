@@ -15,6 +15,7 @@ import { ProviderModel } from 'src/app/models/provider.model';
 import { Subscription } from 'rxjs';
 import { ServiceModel } from 'src/app/models/service.mode';
 import { BookingConfigModel } from 'src/app/models/bookingconfig.model';
+import { Timestamp } from '@angular/fire/firestore';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -42,15 +43,15 @@ export class BookingwizardPage implements OnInit {
     private router: Router,
     private alertController: AlertController,
     private firestoreService: FirestoreService
-  ) { }
+  ) {}
 
   async ngOnInit() {
     this.bookingConfig = await this.firestoreService.getBookingConfig();
     this.observableServices = this.firestoreService
-    .streamAllServices()
-    .subscribe((data) => {
-      this.services = data;
-    });
+      .streamAllServices()
+      .subscribe((data) => {
+        this.services = data;
+      });
   }
 
   abort() {
@@ -146,33 +147,33 @@ export class BookingwizardPage implements OnInit {
 
   async calendarChange(value) {
     const dateTime = parseISO(value);
-    const date = format(dateTime, 'yyyy-MM-dd');
+    dateTime.setHours(0, 0, 0, 0);
+    const timestamp = Timestamp.fromDate(dateTime);
+    console.log(timestamp.seconds);
+    //const date = format(dateTime, 'yyyy-MM-dd');
     const weekDay = format(dateTime, 'e');
-    const dayTimeSlots = this.getSlotsOfWeekDay(weekDay);
-
+    //const dayTimeSlots = this.getSlotsOfWeekDay(weekDay);
     if (this.observableBookings) {
       this.observableBookings.unsubscribe();
     }
-
     this.observableBookings = this.firestoreService
-      .streamBookingsByProvider(this.selectedProvider, new Date(date))
+      .streamBookingsByProvider(this.selectedProvider, timestamp, 1)
       .subscribe((bookings) => {
         this.availableSlots = [];
-
-        if(bookings.length) {
-          for(const booking of bookings) {
-            for(const dayTimeSlot of dayTimeSlots) {
-              const timestamp = new Date(date + ' ' + dayTimeSlot).getTime() / 1000;
-              if(timestamp < booking.date.start.seconds || timestamp > booking.date.end.seconds) {
-                this.availableSlots.push(dayTimeSlot);
-              }
-            }
-          }
-        }
-        else {
-          this.availableSlots = dayTimeSlots;
-        }
-        this.availableSlots = this.filterDuration(date);
+        console.log(bookings);
+        // if(bookings.length) {
+        //   for(const booking of bookings) {
+        //     for(const dayTimeSlot of dayTimeSlots) {
+        //       const timestamp = new Date(date + ' ' + dayTimeSlot).getTime() / 1000;
+        //       if(timestamp < booking.date.start.seconds || timestamp > booking.date.end.seconds) {
+        //         this.availableSlots.push(dayTimeSlot);
+        //       }
+        //     }
+        //   }
+        // } else {
+        //   this.availableSlots = dayTimeSlots;
+        // }
+        // this.availableSlots = this.filterDuration(date);
       });
   }
 
@@ -181,23 +182,26 @@ export class BookingwizardPage implements OnInit {
     const slotSizeInMs = this.bookingConfig.slotsize * 60000; // Minuten in Millisekunden
     const final = [];
 
-    for(let i = 0; i < this.availableSlots.length; i++) {
+    for (let i = 0; i < this.availableSlots.length; i++) {
       // console.log('Current: ' + this.availableSlots[i]);
-      for(let j = i; j <= (i + this.selectedService.duration); j++) {
-        const currentTimestamp = new Date(date + ' ' + this.availableSlots[j]).getTime();
-        const nextTimestamp = new Date(date + ' ' + this.availableSlots[j + 1]).getTime();
+      for (let j = i; j <= i + this.selectedService.duration; j++) {
+        const currentTimestamp = new Date(
+          date + ' ' + this.availableSlots[j]
+        ).getTime();
+        const nextTimestamp = new Date(
+          date + ' ' + this.availableSlots[j + 1]
+        ).getTime();
 
         // console.log(this.availableSlots[j + 1]);
 
-        if((currentTimestamp + slotSizeInMs) === nextTimestamp) {
+        if (currentTimestamp + slotSizeInMs === nextTimestamp) {
           consecutiveSlots++;
-        }
-        else {
+        } else {
           break;
         }
       }
 
-      if(consecutiveSlots >= this.selectedService.duration) {
+      if (consecutiveSlots >= this.selectedService.duration) {
         final.push(this.availableSlots[i]);
       }
       // console.log('Consecutive slots: ' + consecutiveSlots);
@@ -207,5 +211,4 @@ export class BookingwizardPage implements OnInit {
 
     return final;
   }
-
 }

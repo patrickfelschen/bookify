@@ -12,6 +12,7 @@ import {
   orderBy,
   query,
   setDoc,
+  Timestamp,
   where,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
@@ -92,14 +93,15 @@ export class FirestoreService {
     return collectionData(providerQuery, { idField: 'uid' });
   }
 
-  streamBookingsByProvider(provider: ProviderModel, start: Date): Observable<BookingModel[]> {
+  streamBookingsByProvider(provider: ProviderModel, startDay: Timestamp, days?: number): Observable<BookingModel[]> {
     const bookingsCollection = collection(
       this.firestore,
       `providers/${provider.uid}/bookings`
     ).withConverter(bookingModelConverter);
     const bookingsQuery = query(
       bookingsCollection,
-      where('date.start', '>=', start)
+      where('date.day', '>=', startDay.seconds),
+      where('date.day', '<=', startDay.seconds + (days * 60 * 60 * 24))
     );
     return collectionData(bookingsQuery, { idField: 'uid' });
   }
