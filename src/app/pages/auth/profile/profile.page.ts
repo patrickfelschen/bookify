@@ -25,7 +25,7 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.mail = this.firestoreService.getCurrentAuthUser().email;
-    this.userObservable = this.firestoreService.getUserProfile().subscribe(res => {
+    this.userObservable = this.firestoreService.streamUserProfile().subscribe(res => {
       this.user = new UserModel('', res.firstname, res.lastname, res.addressline1, res.addressline2, res.postalcode, res.city);
     });
   }

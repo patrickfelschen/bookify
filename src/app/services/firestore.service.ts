@@ -57,7 +57,7 @@ export class FirestoreService {
     }
   }
 
-  getUserProfile() {
+  streamUserProfile() {
     const authUser = this.getCurrentAuthUser();
     const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
     return docData(userDocRef, { idField: 'uid' });
@@ -73,11 +73,11 @@ export class FirestoreService {
     }
   }
 
-  getAllServices() {
+  streamAllServices() {
     return collectionData(this.servicesCollection, { idField: 'uid' });
   }
 
-  getProvidersByService(service) {
+  streamProvidersByService(service) {
     const providerQuery = query(
       this.providersCollection,
       where('serviceUids', 'array-contains', service.uid),
@@ -86,7 +86,7 @@ export class FirestoreService {
     return collectionData(providerQuery, { idField: 'uid' });
   }
 
-  async getBookingsByProvider(provider, date) {
+  streamBookingsByProvider(provider, date) {
     const bookingsCollection = collection(this.firestore, `providers/${provider.uid}/bookings`);
     const bookingsQuery = query(
       bookingsCollection,
@@ -94,8 +94,7 @@ export class FirestoreService {
       where('date.start', '>=', date),
       //orderBy('date.start', 'asc')
     );
-    const querySnap = await getDocs(bookingsQuery); // ?????
-    return querySnap.docs;
+    return collectionData(bookingsQuery, {idField: 'uid'});
   }
 
   async createBooking(booking) {

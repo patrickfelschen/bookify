@@ -10,7 +10,7 @@ import { IonDatetime, IonicSlides, IonSlides } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { FirestoreService } from 'src/app/services/firestore.service';
-import { format, parseISO,  } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -38,11 +38,13 @@ export class BookingwizardPage implements OnInit {
   constructor(
     private router: Router,
     private alertController: AlertController,
-    private firestoreService: FirestoreService,
+    private firestoreService: FirestoreService
   ) {
-    this.observableServices = this.firestoreService.getAllServices().subscribe((data) => {
-      this.services = data;
-    });
+    this.observableServices = this.firestoreService
+      .streamAllServices()
+      .subscribe((data) => {
+        this.services = data;
+      });
   }
 
   async ngOnInit() {
@@ -61,16 +63,18 @@ export class BookingwizardPage implements OnInit {
   chooseProviderSlide(service) {
     this.observableServices.unsubscribe();
     this.selectedService = service;
-    this.observableProviders = (this.firestoreService.getProvidersByService(this.selectedService)).subscribe((data) => {
-      this.providers = data;
-    });
+    this.observableProviders = this.firestoreService
+      .streamProvidersByService(this.selectedService)
+      .subscribe((data) => {
+        this.providers = data;
+      });
     this.currentSlide++;
     this.slides.slideNext();
   }
 
   async chooseDateSlide(provider) {
     this.observableProviders.unsubscribe();
-    if(provider === null) {
+    if (provider === null) {
       // Beliebig
     }
     this.selectedProvider = provider;
@@ -144,9 +148,17 @@ export class BookingwizardPage implements OnInit {
     const weekDay = format(dateTime, 'e');
     this.dayTimeSlots = this.getSlotsOfWeekDay(weekDay);
 
-    const bookings = await this.firestoreService.getBookingsByProvider(this.selectedProvider, new Date(date));
+    if (this.observableBookings) {
+      this.observableBookings.unsubscribe();
+    }
 
-    console.log(bookings);
+    this.observableBookings = this.firestoreService
+      .streamBookingsByProvider(this.selectedProvider, new Date(date))
+      .subscribe((data) => {
+        this.bookings = data;
+      });
+
+    console.log(this.bookings);
     console.log(date);
   }
 }
