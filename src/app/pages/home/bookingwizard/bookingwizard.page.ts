@@ -34,6 +34,7 @@ export class BookingwizardPage implements OnInit {
   observableBookings;
   bookingConfig;
   dayTimeSlots = [];
+  availableSlots = [];
 
   constructor(
     private router: Router,
@@ -150,15 +151,67 @@ export class BookingwizardPage implements OnInit {
 
     if (this.observableBookings) {
       this.observableBookings.unsubscribe();
+      this.bookings = [];
     }
 
     this.observableBookings = this.firestoreService
       .streamBookingsByProvider(this.selectedProvider, new Date(date))
       .subscribe((data) => {
+        this.availableSlots = [];
         this.bookings = data;
-      });
 
-    console.log(this.bookings);
-    console.log(date);
+        if(this.bookings.length) {
+          for(const booking of this.bookings) {
+            for(const dayTimeSlot of this.dayTimeSlots) {
+              const timestamp = new Date(date + ' ' + dayTimeSlot).getTime() / 1000;
+              if(timestamp < booking.date.start.seconds || timestamp > booking.date.end.seconds) {
+                this.availableSlots.push(dayTimeSlot);
+              }
+            }
+          }
+        }
+        else {
+          this.availableSlots = this.dayTimeSlots;
+        }
+        this.availableSlots = this.filterDuration(date);
+      });
+  }
+
+  filterDuration(date) {
+    let consecutiveSlots = 0;
+    const slotSizeInMs = this.bookingConfig.slotsize * 60000; // Minuten in Millisekunden
+    const final = [];
+
+    for(let i = 0; i < this.availableSlots.length; i++) {
+      // console.log('Current: ' + this.availableSlots[i]);
+      for(let j = i; j <= (i + this.selectedService.duration); j++) {
+        const currentTimestamp = new Date(date + ' ' + this.availableSlots[j]).getTime();
+        const nextTimestamp = new Date(date + ' ' + this.availableSlots[j + 1]).getTime();
+
+        // console.log(this.availableSlots[j + 1]);
+
+        if((currentTimestamp + slotSizeInMs) === nextTimestamp) {
+          consecutiveSlots++;
+        }
+        else {
+          break;
+        }
+      }
+
+      if(consecutiveSlots >= this.selectedService.duration) {
+        final.push(this.availableSlots[i]);
+      }
+      // console.log('Consecutive slots: ' + consecutiveSlots);
+      // console.log('---------------------------');
+      // consecutiveSlots = 0;
+    }
+
+    return final;
+  }
+
+  checkNextDay(slots) {
+    let consecutiveSlots = slots;
+
+
   }
 }
