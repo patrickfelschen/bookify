@@ -198,4 +198,8 @@ export class BookingwizardPage implements OnInit, OnDestroy {
         );
       });
   }
+
+  isValidDay(dateString: string) {
+    return new Date(dateString) >= new Date();
+  }
 }
