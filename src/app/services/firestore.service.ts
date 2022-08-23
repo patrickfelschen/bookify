@@ -111,19 +111,21 @@ export class FirestoreService {
     return collectionData(bookingsQuery, { idField: 'uid' });
   }
 
-  async createBooking(booking: BookingModel) {
+  async createBooking(booking: BookingModel, slots: SlotModel[]) {
     const authUser = this.getCurrentAuthUser();
     const userBookingsCollection = collection(
       this.firestore,
       `users/${authUser.uid}/bookings`
     ).withConverter(bookingModelConverter);
-    // const providerBookingsCollection = collection(
-    //   this.firestore,
-    //   `providers/${booking.provider.uid}/bookings`
-    // );
+    const providerBookingsCollection = collection(
+      this.firestore,
+      `providers/${booking.provider.uid}/slots`
+    ).withConverter(slotModelConverter);
     try {
       await addDoc(userBookingsCollection, booking);
-      // await addDoc(providerBookingsCollection, booking.date);
+      for(const slot of slots){
+        await addDoc(providerBookingsCollection, slot);
+      }
       return true;
     } catch (error) {
       console.log(error);
