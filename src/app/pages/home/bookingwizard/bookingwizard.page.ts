@@ -41,6 +41,8 @@ export class BookingwizardPage implements OnInit, OnDestroy {
   observableSlots: Subscription = Subscription.EMPTY;
   config: SlotConfigModel;
   availableSlots = [];
+  blockedSlots = [];
+  dayCount = 1;
 
   constructor(
     private router: Router,
@@ -176,55 +178,133 @@ export class BookingwizardPage implements OnInit, OnDestroy {
   }
 
   async calendarChange(value) {
-    const selectedDateTime = parseISO(value);
-    const weekDay = format(selectedDateTime, 'e');
-    const configSlots = []; //this.getSlotsOfWeekDay(weekDay);
-
-    for (let i = 0; i < 86400000; i += 3600000) {
-      configSlots.push(i);
-    }
-
-    console.log(configSlots);
+    const dateTime = parseISO(value);
 
     if (this.observableSlots) {
       this.observableSlots.unsubscribe();
     }
 
     this.observableSlots = this.firestoreService
-      .streamSlotsByProvider(this.selectedProvider, selectedDateTime, 1)
+      .streamSlotsByProvider(this.selectedProvider, dateTime, this.dayCount)
       .subscribe((slots) => {
-        this.availableSlots = [];
-        console.log(slots);
+        // Alle möglichen Slots des Tages (falls dayCount > 0 auch Slots der nächsten Tage)
+        this.availableSlots = this.getDayTimeSlots(dateTime, this.dayCount);
+        this.blockedSlots = [];
 
-        const freeSlots = [];
-        let configSlotTimestamp;
-        for (const configSlot of configSlots) {
-          let isfree = true;
-          // Check if slot is full
-          for (const fullSlot of slots) {
-            for (const slotSeconds of fullSlot.slotSeconds) {
-              configSlotTimestamp = Timestamp.fromMillis(
-                fullSlot.daySeconds + configSlot
-              );
-              const fullSlotTimestamp = Timestamp.fromMillis(
-                fullSlot.daySeconds + slotSeconds
-              );
-              if (configSlotTimestamp.isEqual(fullSlotTimestamp)) {
-                isfree = false;
-              }
+        // Falls Bookings vorhanden
+        if(slots.length) {
+          // Belegte Slots
+          for(const slot of slots) {
+            const dayInSeconds = slot.daySeconds;
+            for(const bookingSlot of slot.slotSeconds) {
+              this.blockedSlots.push(dayInSeconds + bookingSlot);
             }
           }
-          if (isfree === true) {
-            const date = format(configSlotTimestamp.toMillis(), 'HH:mm');
-            freeSlots.push(date);
+
+          // Belegte Slots von verfügbaren abziehen
+          let slotBlocked = false;
+          for(let i = 0; i < this.availableSlots.length; i++) {
+            // console.log('Slot: ' + new Date(this.availableSlots[i]));
+            for(const blockedTimestamp of this.blockedSlots) {
+              // console.log('Blocked: ' + new Date(blockedTimestamp));
+              if(this.availableSlots[i] === blockedTimestamp) {
+                slotBlocked = true;
+              }
+            }
+            if(slotBlocked) {
+              // console.log('Treffer');
+              this.availableSlots.splice(i, 1);
+              i--; // Beim Löschen wird nächstes Element nachgeschoben, i dekrementieren, verhindert Überspringen des Elementes
+            }
+            slotBlocked = false;
+            // console.log('------------------');
           }
-          // Check if duration fit in slots
-          const totalDuration =
-            this.selectedService.duration * this.config.slotSeconds;
-          // ...
         }
 
-        this.availableSlots = freeSlots;
+        this.availableSlots = this.filterDuration();
+        this.availableSlots = this.convertTimestampsToHours(dateTime);
       });
+  }
+
+  filterDuration() {
+    let consecutiveSlots = 0;
+    const slotSize = this.config.slotSeconds;
+    const final = [];
+
+    // Alle übrigen Slots
+    for (let i = 0; i < this.availableSlots.length; i++) {
+      // console.log('Current: ' + new Date(this.availableSlots[i]).toLocaleTimeString());
+      // Schleife von aktuellem Slot bis Slot + Länge der Dienstleistung
+      for (let j = i; j < i + this.selectedService.duration; j++) {
+        const currentTimestamp = this.availableSlots[j];
+        const nextTimestamp = this.availableSlots[j + 1];
+
+        // console.log('Next: ' + new Date(this.availableSlots[j + 1]).toLocaleTimeString());
+
+        // Wenn aktueller Timestamp + die Länge eines Zeitslots = dem nächsten Timestamp sind, gibt es zwischen diesen keine Unterbrechung
+        if (currentTimestamp + slotSize === nextTimestamp) {
+          consecutiveSlots++;
+        } else {
+          break;
+        }
+      }
+
+      // Prüfen, ob genug zusammenhängende Slots für die gewählte Dienstleistung gefunden wurden
+      if (consecutiveSlots >= this.selectedService.duration) {
+        final.push(this.availableSlots[i]);
+      }
+      // console.log('Consecutive slots: ' + consecutiveSlots);
+      // console.log('---------------------------');
+      consecutiveSlots = 0;
+    }
+
+    return final;
+  }
+
+  getDayTimeSlots(dateTime, dayCount) {
+    // Gewählter Wochentag (1 - 7)
+    const weekday = parseInt(format(dateTime, 'e'));
+    const timestamp = Timestamp.fromDate(dateTime);
+    const dayInMs = 86400000; // Millisekunden eines Tages
+    const slots = [];
+    let tmp = [];
+
+    for(let i = 0; i <= dayCount; i++) {
+      // Index für die Slots der nächsten Tage. Modulo Rechnung um Werte von 1 - 7 zu erhalten
+      const index = ((weekday + i)  - 1) % 7 + 1;
+      tmp = this.getSlotsOfWeekDay(index.toString());
+
+      for(const slot of tmp) {
+        slots.push(((timestamp.toMillis() + slot) + (i * dayInMs)));
+      }
+    }
+
+    return slots;
+  }
+
+  sameDay(timestamp1: Timestamp, timestamp2: Timestamp) {
+    const date1 = new Date(timestamp1.toMillis());
+    const date2 = new Date(timestamp2.toMillis());
+
+    if(date1.toDateString() === date2.toDateString()) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  convertTimestampsToHours(currentDay) {
+    const tmp = [];
+    for(const t of this.availableSlots) {
+      // Nur freie Zeiten vom aktuellen Tag (gewählt im Kalender) werden angezeigt
+      if(this.sameDay(Timestamp.fromDate(currentDay), Timestamp.fromMillis(t))) {
+        const date = new Date(t);
+        const time = date.toLocaleTimeString();
+        tmp.push(time);
+      }
+    }
+
+    return tmp;
   }
 }
