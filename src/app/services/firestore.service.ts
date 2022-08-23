@@ -17,8 +17,6 @@ import {
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { BookingModel, bookingModelConverter } from '../models/booking.model';
-import { BookingConfigModel, bookingConfigModelConverter } from '../models/bookingconfig.model';
-import { DateModel } from '../models/date.model';
 import { ProviderModel, providerModelConverter } from '../models/provider.model';
 import { ServiceModel, serviceModelConverter } from '../models/service.mode';
 import { SlotModel, slotModelConverter } from '../models/slot.model';
