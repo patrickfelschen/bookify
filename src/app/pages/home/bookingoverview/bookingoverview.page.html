@@ -19,11 +19,12 @@
         <ion-item class="booking" button lines="full">
           <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
           <ion-label>
-            <h2>Hochzeit (200 Pers.)</h2>
-            <h3>Timmy Trumpet</h3>
+            <h2>{{ this.currentBooking.service.description }}</h2>
+            <h3>{{ this.currentBooking.provider.name }}</h3>
           </ion-label>
           <ion-label slot="end">
-            <ion-text>morgen</ion-text>
+            <h3>{{ this.currentBooking.date?.getStartTimeString() }}</h3>
+            <h3>{{ this.currentBooking.date?.getEndTimeString() }}</h3>
           </ion-label>
         </ion-item>
       </ion-col>
@@ -32,11 +33,11 @@
       <ion-col>
         <ion-item lines="none">
           <ion-icon name="mail" slot="start" color="primary"></ion-icon>
-          <ion-label>timmy@trumpet.de</ion-label>
+          <ion-label>{{ this.currentBooking.provider.email }}</ion-label>
         </ion-item>
         <ion-item lines="none">
           <ion-icon name="call" slot="start" color="primary"></ion-icon>
-          <ion-label>+49 12345 45452</ion-label>
+          <ion-label>{{ this.currentBooking.provider.phone }}</ion-label>
         </ion-item>
       </ion-col>
     </ion-row>

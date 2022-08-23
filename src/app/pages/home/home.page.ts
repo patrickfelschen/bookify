@@ -43,8 +43,8 @@ export class HomePage implements OnInit, OnDestroy {
     this.router.navigateByUrl('profile', { replaceUrl: true });
   }
 
-  bookingOverview(): void {
-    this.router.navigateByUrl('bookingoverview', { replaceUrl: true });
+  bookingOverview(booking): void {
+    this.router.navigateByUrl('bookingoverview', { replaceUrl: true, state: { currentBooking: booking } });
   }
 
   newBooking(): void {
