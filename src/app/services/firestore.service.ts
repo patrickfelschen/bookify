@@ -7,6 +7,7 @@ import {
   CollectionReference,
   doc,
   docData,
+  DocumentReference,
   Firestore,
   getDoc,
   orderBy,
@@ -122,8 +123,9 @@ export class FirestoreService {
       `providers/${booking.provider.uid}/slots`
     ).withConverter(slotModelConverter);
     try {
-      await addDoc(userBookingsCollection, booking);
+      const bookingDoc: DocumentReference = await addDoc(userBookingsCollection, booking);
       for(const slot of slots){
+        slot.bookingUid = bookingDoc.id;
         await addDoc(providerBookingsCollection, slot);
       }
       return true;

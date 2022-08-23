@@ -6,11 +6,13 @@ import {
 
 export class SlotModel {
   public uid?: string;
+  public bookingUid: string;
   public dayMillis: number;
   public slotsMillis: number[];
 
-  constructor({ uid = '', dayMillis, slotsMillis }) {
+  constructor({ uid = '', bookingUid = '', dayMillis, slotsMillis }) {
     this.uid = uid;
+    this.bookingUid = bookingUid;
     this.dayMillis = dayMillis;
     this.slotsMillis = slotsMillis;
   }
@@ -34,6 +36,7 @@ export class SlotModel {
 
 export const slotModelConverter = {
   toFirestore: (m: SlotModel) => ({
+    bookingUid: m.bookingUid,
     dayMillis: m.dayMillis,
     slotsMillis: m.slotsMillis,
   }),
@@ -41,6 +44,7 @@ export const slotModelConverter = {
     const d = snapshot.data(options);
     return new SlotModel({
       uid: d.uid,
+      bookingUid: d.bookingUid,
       dayMillis: d.dayMillis,
       slotsMillis: d.slotsMillis,
     });
