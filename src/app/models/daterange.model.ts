@@ -1,10 +1,10 @@
 import { Timestamp } from '@angular/fire/firestore';
 
 export class DateRangeModel {
-  public day: Timestamp;
-  public slots: Timestamp[];
+  public day: number;
+  public slots: number[];
 
-  constructor(day: Timestamp, slots: Timestamp[]) {
+  constructor(day: number, slots: number[]) {
     this.day = day;
     this.slots = slots;
   }

@@ -71,7 +71,7 @@ export class FirestoreService {
   }
 
   async getBookingConfig(): Promise<BookingConfigModel> {
-    const configDocRef = doc(this.firestore, `configs/booking`).withConverter(bookingConfigModelConverter);
+    const configDocRef = doc(this.firestore, `configs/slotconfig`).withConverter(bookingConfigModelConverter);
     try {
       const docSnap = await getDoc(configDocRef);
       return docSnap.data();
@@ -93,15 +93,18 @@ export class FirestoreService {
     return collectionData(providerQuery, { idField: 'uid' });
   }
 
-  streamBookingsByProvider(provider: ProviderModel, startDay: Timestamp, days?: number): Observable<BookingModel[]> {
+  streamBookingsByProvider(provider: ProviderModel, startDay: Date, days?: number): Observable<BookingModel[]> {
+    startDay.setHours(0, 0, 0, 0);
+    const timestamp = Timestamp.fromDate(startDay);
+
     const bookingsCollection = collection(
       this.firestore,
       `providers/${provider.uid}/bookings`
     ).withConverter(bookingModelConverter);
     const bookingsQuery = query(
       bookingsCollection,
-      where('date.day', '>=', startDay.seconds),
-      where('date.day', '<=', startDay.seconds + (days * 60 * 60 * 24))
+      where('date.day', '>=', timestamp.toMillis()),
+      where('date.day', '<=', timestamp.toMillis() + (days * 60 * 60 * 24 * 1000))
     );
     return collectionData(bookingsQuery, { idField: 'uid' });
   }

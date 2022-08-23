@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import SwiperCore, {
   Autoplay,
   Keyboard,
@@ -25,7 +25,7 @@ SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
   templateUrl: './bookingwizard.page.html',
   styleUrls: ['./bookingwizard.page.scss'],
 })
-export class BookingwizardPage implements OnInit {
+export class BookingwizardPage implements OnInit, OnDestroy {
   @ViewChild('slides') slides: IonSlides;
   @ViewChild('calendar') calendar: IonDatetime;
 
@@ -34,9 +34,9 @@ export class BookingwizardPage implements OnInit {
   services: ServiceModel[] = [];
   providers: ProviderModel[] = [];
   currentSlide = 0;
-  observableProviders: Subscription;
-  observableServices: Subscription;
-  observableBookings: Subscription;
+  observableProviders: Subscription = Subscription.EMPTY;
+  observableServices: Subscription = Subscription.EMPTY;
+  observableBookings: Subscription = Subscription.EMPTY;
   bookingConfig: BookingConfigModel;
   availableSlots = [];
   blockedSlots = [];
@@ -55,6 +55,12 @@ export class BookingwizardPage implements OnInit {
       .subscribe((data) => {
         this.services = data;
       });
+  }
+
+  ngOnDestroy() {
+    this.observableProviders.unsubscribe();
+    this.observableServices.unsubscribe();
+    this.observableBookings.unsubscribe();
   }
 
   abort() {
@@ -150,75 +156,82 @@ export class BookingwizardPage implements OnInit {
 
   async calendarChange(value) {
     const dateTime = parseISO(value);
-    dateTime.setHours(0, 0, 0, 0);
-    const timestamp = Timestamp.fromDate(dateTime);
-    // console.log(timestamp.seconds);
-    const date = format(dateTime, 'yyyy-MM-dd');
-    // const weekDay = format(dateTime, 'e');
-    // const dayTimeSlots = this.getDayTimeSlots(dateTime, 2);
-    // console.log(dayTimeSlots);
+
     if (this.observableBookings) {
       this.observableBookings.unsubscribe();
     }
+
     this.observableBookings = this.firestoreService
-      .streamBookingsByProvider(this.selectedProvider, timestamp, this.dayCount)
+      .streamBookingsByProvider(this.selectedProvider, dateTime, this.dayCount)
       .subscribe((bookings) => {
-        // console.log(bookings);
+        // Alle möglichen Slots des Tages (falls dayCount > 0 auch Slots der nächsten Tage)
         this.availableSlots = this.getDayTimeSlots(dateTime, this.dayCount);
         this.blockedSlots = [];
 
+        // Falls Bookings vorhanden
         if(bookings.length) {
           // Belegte Slots
           for(const booking of bookings) {
+            const dayInSeconds = booking.date.day;
             for(const bookingSlot of booking.date.slots) {
-              this.blockedSlots.push(bookingSlot.seconds);
+              this.blockedSlots.push(dayInSeconds + bookingSlot);
             }
           }
 
           // Belegte Slots von verfügbaren abziehen
           let slotBlocked = false;
-          for(const slot of this.availableSlots) {
+          for(let i = 0; i < this.availableSlots.length; i++) {
+            // console.log('Slot: ' + new Date(this.availableSlots[i]));
             for(const blockedTimestamp of this.blockedSlots) {
-              if(slot === blockedTimestamp) {
+              // console.log('Blocked: ' + new Date(blockedTimestamp));
+              if(this.availableSlots[i] === blockedTimestamp) {
                 slotBlocked = true;
               }
             }
             if(slotBlocked) {
-              this.availableSlots.splice(this.availableSlots.indexOf(slot), 1);
+              // console.log('Treffer');
+              this.availableSlots.splice(i, 1);
+              i--; // Beim Löschen wird nächstes Element nachgeschoben, i dekrementieren, verhindert Überspringen des Elementes
             }
             slotBlocked = false;
+            // console.log('------------------');
           }
         }
-        this.availableSlots = this.filterDuration(date);
-        this.availableSlots = this.convertTimestampsToHours(this.availableSlots);
+
+        this.availableSlots = this.filterDuration();
+        this.availableSlots = this.convertTimestampsToHours(dateTime);
       });
   }
 
-  filterDuration(date) {
+  filterDuration() {
     let consecutiveSlots = 0;
-    const slotSizeInMs = this.bookingConfig.slotsize * 60; // Minuten in Millisekunden
+    const slotSize = this.bookingConfig.slotSeconds;
     const final = [];
 
+    // Alle übrigen Slots
     for (let i = 0; i < this.availableSlots.length; i++) {
-      console.log('Current: ' + new Date(this.availableSlots[i] * 1000).toLocaleTimeString());
-      for (let j = i; j <= i + this.selectedService.duration; j++) {
+      // console.log('Current: ' + new Date(this.availableSlots[i]).toLocaleTimeString());
+      // Schleife von aktuellem Slot bis Slot + Länge der Dienstleistung
+      for (let j = i; j < i + this.selectedService.duration; j++) {
         const currentTimestamp = this.availableSlots[j];
         const nextTimestamp = this.availableSlots[j + 1];
 
-        console.log('Next: ' + new Date(this.availableSlots[j + 1] * 1000).toLocaleTimeString());
+        // console.log('Next: ' + new Date(this.availableSlots[j + 1]).toLocaleTimeString());
 
-        if (currentTimestamp + slotSizeInMs === nextTimestamp) {
+        // Wenn aktueller Timestamp + die Länge eines Zeitslots = dem nächsten Timestamp sind, gibt es zwischen diesen keine Unterbrechung
+        if (currentTimestamp + slotSize === nextTimestamp) {
           consecutiveSlots++;
         } else {
           break;
         }
       }
 
+      // Prüfen, ob genug zusammenhängende Slots für die gewählte Dienstleistung gefunden wurden
       if (consecutiveSlots >= this.selectedService.duration) {
         final.push(this.availableSlots[i]);
       }
-      console.log('Consecutive slots: ' + consecutiveSlots);
-      console.log('---------------------------');
+      // console.log('Consecutive slots: ' + consecutiveSlots);
+      // console.log('---------------------------');
       consecutiveSlots = 0;
     }
 
@@ -226,28 +239,29 @@ export class BookingwizardPage implements OnInit {
   }
 
   getDayTimeSlots(dateTime, dayCount) {
+    // Gewählter Wochentag (1 - 7)
     const weekday = parseInt(format(dateTime, 'e'));
-    const date = format(dateTime, 'yyyy-MM-dd');
-    const dayInSeconds = 86400;
+    const timestamp = Timestamp.fromDate(dateTime);
+    const dayInMs = 86400000; // Millisekunden eines Tages
     const slots = [];
     let tmp = [];
 
     for(let i = 0; i <= dayCount; i++) {
-      const index =  ((weekday + i)  - 1) % 7 + 1;
+      // Index für die Slots der nächsten Tage. Modulo Rechnung um Werte von 1 - 7 zu erhalten
+      const index = ((weekday + i)  - 1) % 7 + 1;
       tmp = this.getSlotsOfWeekDay(index.toString());
 
       for(const slot of tmp) {
-        slots.push((Timestamp.fromDate(new Date(date + ' ' + slot)).seconds) + (i * dayInSeconds));
+        slots.push(((timestamp.toMillis() + slot) + (i * dayInMs)));
       }
-
     }
 
     return slots;
   }
 
   sameDay(timestamp1: Timestamp, timestamp2: Timestamp) {
-    const date1 = new Date(timestamp1.seconds * 1000);
-    const date2 = new Date(timestamp2.seconds * 1000);
+    const date1 = new Date(timestamp1.toMillis());
+    const date2 = new Date(timestamp2.toMillis());
 
     if(date1.toDateString() === date2.toDateString()) {
       return true;
@@ -257,12 +271,15 @@ export class BookingwizardPage implements OnInit {
     }
   }
 
-  convertTimestampsToHours(timestamps) {
+  convertTimestampsToHours(currentDay) {
     const tmp = [];
-    for(const t of timestamps) {
-      const date = new Date(t * 1000);
-      const time = date.toLocaleTimeString();
-      tmp.push(time);
+    for(const t of this.availableSlots) {
+      // Nur freie Zeiten vom aktuellen Tag (gewählt im Kalender) werden angezeigt
+      if(this.sameDay(Timestamp.fromDate(currentDay), Timestamp.fromMillis(t))) {
+        const date = new Date(t);
+        const time = date.toLocaleTimeString();
+        tmp.push(time);
+      }
     }
 
     return tmp;
