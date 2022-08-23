@@ -1,36 +1,46 @@
 import { DocumentSnapshot, SnapshotOptions } from '@angular/fire/firestore';
-import { DateRangeModel } from './daterange.model';
+import { DateModel } from './date.model';
 import { ProviderModel } from './provider.model';
 import { ServiceModel } from './service.mode';
 
 export class BookingModel {
-  public date: DateRangeModel;
+  public uid?: string;
+  public date: DateModel;
   public provider: ProviderModel;
   public service: ServiceModel;
-  public uid: string;
 
-  constructor(
-    date: DateRangeModel,
-    provider?: ProviderModel,
-    service?: ServiceModel,
-    uid?: string
-  ) {
+  constructor({ uid = '', date, provider, service }) {
+    this.uid = uid;
     this.date = date;
     this.provider = provider;
     this.service = service;
-    this.uid = uid;
   }
 }
 
 export const bookingModelConverter = {
-  toFirestore: (model: BookingModel) => ({
-    date: model.date,
-    provider: model.provider,
-    service: model.service,
-    uid: model.uid,
+  toFirestore: (m: BookingModel) => ({
+    date: {
+      start: m.date.start,
+      end: m.date.end,
+    },
+    provider: {
+      uid: m.provider.uid,
+      name: m.provider.name,
+      email: m.provider.email,
+      phone: m.provider.phone,
+    },
+    service: {
+      uid: m.service.uid,
+      description: m.service.description,
+    },
   }),
   fromFirestore: (snapshot: DocumentSnapshot, options: SnapshotOptions) => {
-    const data = snapshot.data(options);
-    return new BookingModel(data.date, data.provider, data.service, data.uid);
+    const d = snapshot.data(options);
+    return new BookingModel({
+      uid: d.uid,
+      date: d.date,
+      provider: d.provider,
+      service: d.service,
+    });
   },
 };

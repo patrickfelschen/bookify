@@ -17,10 +17,10 @@ import {
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { BookingModel, bookingModelConverter } from '../models/booking.model';
-import { BookingConfigModel, bookingConfigModelConverter } from '../models/bookingconfig.model';
-import { DateRangeModel } from '../models/daterange.model';
 import { ProviderModel, providerModelConverter } from '../models/provider.model';
 import { ServiceModel, serviceModelConverter } from '../models/service.mode';
+import { SlotModel, slotModelConverter } from '../models/slot.model';
+import { SlotConfigModel, slotConfigModelConverter } from '../models/slotsconfig.model';
 import { UserModel, userModelConverter } from '../models/user.model';
 
 @Injectable({
@@ -48,6 +48,7 @@ export class FirestoreService {
       const docSnap = await getDoc(userDocRef);
       return docSnap.exists();
     } catch (error) {
+      console.log(error);
       return false;
     }
   }
@@ -70,12 +71,13 @@ export class FirestoreService {
     return docData(userDocRef, { idField: 'uid' });
   }
 
-  async getBookingConfig(): Promise<BookingConfigModel> {
-    const configDocRef = doc(this.firestore, `configs/slotconfig`).withConverter(bookingConfigModelConverter);
+  async getSlotConfig(): Promise<SlotConfigModel> {
+    const configDocRef = doc(this.firestore, `configs/slotconfig`).withConverter(slotConfigModelConverter);
     try {
       const docSnap = await getDoc(configDocRef);
       return docSnap.data();
     } catch (error) {
+      console.log(error);
       return null;
     }
   }
@@ -93,18 +95,18 @@ export class FirestoreService {
     return collectionData(providerQuery, { idField: 'uid' });
   }
 
-  streamBookingsByProvider(provider: ProviderModel, startDay: Date, days?: number): Observable<BookingModel[]> {
+  streamSlotsByProvider(provider: ProviderModel, startDay: Date, days?: number): Observable<SlotModel[]> {
     startDay.setHours(0, 0, 0, 0);
-    const timestamp = Timestamp.fromDate(startDay);
-
-    const bookingsCollection = collection(
+    const startTimestamp = Timestamp.fromDate(startDay);
+    console.log(startTimestamp.toMillis());
+    const slotsCollection = collection(
       this.firestore,
-      `providers/${provider.uid}/bookings`
-    ).withConverter(bookingModelConverter);
+      `providers/${provider.uid}/slots`
+    ).withConverter(slotModelConverter);
     const bookingsQuery = query(
-      bookingsCollection,
-      where('date.day', '>=', timestamp.toMillis()),
-      where('date.day', '<=', timestamp.toMillis() + (days * 60 * 60 * 24 * 1000))
+      slotsCollection,
+      where('daySeconds', '>=', startTimestamp.toMillis()),
+      where('daySeconds', '<=', startTimestamp.toMillis() + (days * 60 * 60 * 24 * 1000))
     );
     return collectionData(bookingsQuery, { idField: 'uid' });
   }
@@ -114,17 +116,44 @@ export class FirestoreService {
     const userBookingsCollection = collection(
       this.firestore,
       `users/${authUser.uid}/bookings`
-    );
-    const providerBookingsCollection = collection(
-      this.firestore,
-      `providers/${booking.provider.uid}/bookings`
-    );
+    ).withConverter(bookingModelConverter);
+    // const providerBookingsCollection = collection(
+    //   this.firestore,
+    //   `providers/${booking.provider.uid}/bookings`
+    // );
     try {
       await addDoc(userBookingsCollection, booking);
-      await addDoc(providerBookingsCollection, booking.date);
+      // await addDoc(providerBookingsCollection, booking.date);
       return true;
     } catch (error) {
+      console.log(error);
       return false;
     }
+  }
+
+  streamPastBooking() {
+    const authUser = this.getCurrentAuthUser();
+    const userBookingsCollection = collection(
+      this.firestore,
+      `users/${authUser.uid}/bookings`
+    ).withConverter(bookingModelConverter);
+    const bookingQuery = query(
+      userBookingsCollection,
+      where('date.end', '<', Timestamp.now().toMillis())
+    );
+    return collectionData(bookingQuery, {idField: 'uid'});
+  }
+
+  streamFutureBooking() {
+    const authUser = this.getCurrentAuthUser();
+    const userBookingsCollection = collection(
+      this.firestore,
+      `users/${authUser.uid}/bookings`
+    ).withConverter(bookingModelConverter);
+    const bookingQuery = query(
+      userBookingsCollection,
+      where('date.end', '>=', Timestamp.now().toMillis())
+    );
+    return collectionData(bookingQuery, {idField: 'uid'});
   }
 }

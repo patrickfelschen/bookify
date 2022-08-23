@@ -26,12 +26,14 @@
         <ion-row>
           <ion-col>
             <ion-list>
-              <ion-item *ngFor="let service of services" class="booking" lines="full" button (click)="chooseProviderSlide(service)" >
-                <ion-icon name="briefcase" slot="start" color="primary"></ion-icon>
-                <ion-label>
-                  <h2>{{ service.description }}</h2>
-                </ion-label>
-              </ion-item>
+              <div *ngFor="let service of services">
+                <ion-item button class="booking" lines="full" (click)="chooseProviderSlide(service)">
+                  <ion-icon name="briefcase" slot="start" color="primary"></ion-icon>
+                  <ion-label>
+                    <h2>{{ service.description }}</h2>
+                  </ion-label>
+                </ion-item>
+              </div>
             </ion-list>
           </ion-col>
         </ion-row>
@@ -53,12 +55,14 @@
                   <h2>Beliebig</h2>
                 </ion-label>
               </ion-item>
-              <ion-item *ngFor="let provider of providers" class="booking" lines="full" button (click)="chooseDateSlide(provider)">
-                <ion-icon name="person" slot="start" color="primary"></ion-icon>
-                <ion-label>
-                  <h2>{{ provider.name }}</h2>
-                </ion-label>
-              </ion-item>
+              <div *ngFor="let provider of providers">
+                <ion-item class="booking" lines="full" button (click)="chooseDateSlide(provider)">
+                  <ion-icon name="person" slot="start" color="primary"></ion-icon>
+                  <ion-label>
+                    <h2>{{ provider.name }}</h2>
+                  </ion-label>
+                </ion-item>
+              </div>
             </ion-list>
           </ion-col>
         </ion-row>
@@ -73,7 +77,8 @@
         </ion-row>
         <ion-row>
           <ion-col>
-            <ion-datetime #calendar (ionChange)="calendarChange(calendar.value)" color="primary" locale="de-DE" presentation="date" displayFormat="YYYY">
+            <ion-datetime #calendar (ionChange)="calendarChange(calendar.value)" color="primary" locale="de-DE"
+              presentation="date" displayFormat="YYYY">
             </ion-datetime>
           </ion-col>
         </ion-row>
@@ -86,7 +91,10 @@
         </ion-row>
         <ion-row>
           <ion-col>
-            <ion-chip *ngFor="let slot of availableSlots" color="primary" (click)="confirmSlide()">{{ slot }}</ion-chip>
+            <div *ngFor="let slot of availableSlots">
+              <ion-chip color="primary" (click)="confirmSlide()">{{ slot }}
+              </ion-chip>
+            </div>
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -103,11 +111,11 @@
             <ion-item class="booking" button lines="none">
               <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
               <ion-label>
-                <h2>Hochzeit (200 Pers.)</h2>
-                <h3>Timmy Trumpet</h3>
+                <h2>{{this.selectedService?.description}}</h2>
+                <h3>{{this.selectedProvider?.name}}</h3>
               </ion-label>
               <ion-label slot="end">
-                <ion-text>20.08.2022</ion-text>
+                <ion-text>{{this.selectedDate?.start}}</ion-text>
               </ion-label>
             </ion-item>
           </ion-col>
@@ -116,11 +124,11 @@
           <ion-col>
             <ion-item lines="none">
               <ion-icon name="mail" slot="start" color="primary"></ion-icon>
-              <ion-label>timmy@trumpet.de</ion-label>
+              <ion-label>{{this.selectedProvider?.email}}</ion-label>
             </ion-item>
             <ion-item lines="none">
               <ion-icon name="call" slot="start" color="primary"></ion-icon>
-              <ion-label>+49 12345 45452</ion-label>
+              <ion-label>{{this.selectedProvider?.phone}}</ion-label>
             </ion-item>
           </ion-col>
         </ion-row>

@@ -14,9 +14,10 @@ import { format, parseISO } from 'date-fns';
 import { ProviderModel } from 'src/app/models/provider.model';
 import { Subscription } from 'rxjs';
 import { ServiceModel } from 'src/app/models/service.mode';
-import { BookingConfigModel } from 'src/app/models/bookingconfig.model';
 import { Timestamp } from '@angular/fire/firestore';
-import { WeekDay } from '@angular/common';
+import { SlotConfigModel } from 'src/app/models/slotsconfig.model';
+import { BookingModel } from 'src/app/models/booking.model';
+import { DateModel } from 'src/app/models/date.model';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -31,13 +32,14 @@ export class BookingwizardPage implements OnInit, OnDestroy {
 
   selectedService: ServiceModel;
   selectedProvider: ProviderModel;
+  selectedDate: DateModel;
   services: ServiceModel[] = [];
   providers: ProviderModel[] = [];
   currentSlide = 0;
   observableProviders: Subscription = Subscription.EMPTY;
   observableServices: Subscription = Subscription.EMPTY;
-  observableBookings: Subscription = Subscription.EMPTY;
-  bookingConfig: BookingConfigModel;
+  observableSlots: Subscription = Subscription.EMPTY;
+  config: SlotConfigModel;
   availableSlots = [];
   blockedSlots = [];
   dayCount = 1;
@@ -49,7 +51,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit() {
-    this.bookingConfig = await this.firestoreService.getBookingConfig();
+    this.config = await this.firestoreService.getSlotConfig();
     this.observableServices = this.firestoreService
       .streamAllServices()
       .subscribe((data) => {
@@ -60,10 +62,13 @@ export class BookingwizardPage implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.observableProviders.unsubscribe();
     this.observableServices.unsubscribe();
-    this.observableBookings.unsubscribe();
+    this.observableSlots.unsubscribe();
   }
 
   abort() {
+    this.observableProviders.unsubscribe();
+    this.observableServices.unsubscribe();
+    this.observableSlots.unsubscribe();
     this.router.navigateByUrl('home', { replaceUrl: true });
   }
 
@@ -72,35 +77,54 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.slides.slidePrev();
   }
 
-  chooseProviderSlide(service: ServiceModel) {
-    this.observableServices.unsubscribe();
-    this.selectedService = service;
-    this.observableProviders = this.firestoreService
-      .streamProvidersByService(this.selectedService)
-      .subscribe((data) => {
-        this.providers = data;
-      });
+  next() {
     this.currentSlide++;
     this.slides.slideNext();
   }
 
-  async chooseDateSlide(provider: ProviderModel) {
+  chooseProviderSlide(service: ServiceModel) {
+    this.observableServices.unsubscribe();
+    this.selectedService = service;
+    this.observableProviders = this.firestoreService
+      .streamProvidersByService(service)
+      .subscribe((data) => {
+        this.providers = data;
+      });
+    this.next();
+  }
+
+  chooseDateSlide(provider: ProviderModel) {
     this.observableProviders.unsubscribe();
     if (provider === null) {
       // Beliebig
     }
     this.selectedProvider = provider;
-    this.currentSlide++;
-    this.slides.slideNext();
+    this.next();
   }
 
-  confirmSlide() {
-    this.observableBookings.unsubscribe();
-    this.currentSlide++;
-    this.slides.slideNext();
+  async confirmSlide() {
+    this.observableSlots.unsubscribe();
+    const bookingDate = new DateModel({
+      start: 1 * 60 * 60 * 24 * 1000,
+      end: 2 * 60 * 60 * 24 * 1000,
+    });
+    this.selectedDate = bookingDate;
+    this.next();
   }
 
   async confirmBooking() {
+    const booking = new BookingModel({
+      date: this.selectedDate,
+      provider: this.selectedProvider,
+      service: this.selectedService,
+    });
+
+    const res = await this.firestoreService.createBooking(booking);
+
+    if (res === false) {
+      return;
+    }
+
     const alert = await this.alertController.create({
       header: 'Termin speichern?',
       message:
@@ -122,33 +146,32 @@ export class BookingwizardPage implements OnInit, OnDestroy {
         },
       ],
     });
-
     await alert.present();
   }
 
-  getSlotsOfWeekDay(weekDay: string) {
-    let slots;
+  getSlotsOfWeekDay(weekDay: string): number[] {
+    let slots: number[];
     switch (weekDay) {
       case '1':
-        slots = this.bookingConfig.sun;
+        slots = this.config.sun;
         break;
       case '2':
-        slots = this.bookingConfig.mon;
+        slots = this.config.mon;
         break;
       case '3':
-        slots = this.bookingConfig.tue;
+        slots = this.config.tue;
         break;
       case '4':
-        slots = this.bookingConfig.wed;
+        slots = this.config.wed;
         break;
       case '5':
-        slots = this.bookingConfig.thu;
+        slots = this.config.thu;
         break;
       case '6':
-        slots = this.bookingConfig.fri;
+        slots = this.config.fri;
         break;
       case '7':
-        slots = this.bookingConfig.sat;
+        slots = this.config.sat;
         break;
     }
     return slots;
@@ -157,23 +180,23 @@ export class BookingwizardPage implements OnInit, OnDestroy {
   async calendarChange(value) {
     const dateTime = parseISO(value);
 
-    if (this.observableBookings) {
-      this.observableBookings.unsubscribe();
+    if (this.observableSlots) {
+      this.observableSlots.unsubscribe();
     }
 
-    this.observableBookings = this.firestoreService
-      .streamBookingsByProvider(this.selectedProvider, dateTime, this.dayCount)
-      .subscribe((bookings) => {
+    this.observableSlots = this.firestoreService
+      .streamSlotsByProvider(this.selectedProvider, dateTime, this.dayCount)
+      .subscribe((slots) => {
         // Alle möglichen Slots des Tages (falls dayCount > 0 auch Slots der nächsten Tage)
         this.availableSlots = this.getDayTimeSlots(dateTime, this.dayCount);
         this.blockedSlots = [];
 
         // Falls Bookings vorhanden
-        if(bookings.length) {
+        if(slots.length) {
           // Belegte Slots
-          for(const booking of bookings) {
-            const dayInSeconds = booking.date.day;
-            for(const bookingSlot of booking.date.slots) {
+          for(const slot of slots) {
+            const dayInSeconds = slot.daySeconds;
+            for(const bookingSlot of slot.slotSeconds) {
               this.blockedSlots.push(dayInSeconds + bookingSlot);
             }
           }
@@ -205,7 +228,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
 
   filterDuration() {
     let consecutiveSlots = 0;
-    const slotSize = this.bookingConfig.slotSeconds;
+    const slotSize = this.config.slotSeconds;
     const final = [];
 
     // Alle übrigen Slots
