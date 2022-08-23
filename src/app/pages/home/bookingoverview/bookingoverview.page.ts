@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { BookingModel } from 'src/app/models/booking.model';
 
 @Component({
   selector: 'app-bookingoverview',
@@ -7,9 +9,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class BookingoverviewPage implements OnInit {
 
-  constructor() { }
+  currentBooking: BookingModel;
 
-  ngOnInit() {
+  constructor(private router: Router) {
+    if(this.router.getCurrentNavigation().extras.state) {
+      this.currentBooking = this.router.getCurrentNavigation().extras.state.currentBooking;
+    }
   }
 
+  ngOnInit() {
+
+  }
 }
