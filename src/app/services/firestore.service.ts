@@ -98,15 +98,15 @@ export class FirestoreService {
   streamSlotsByProvider(provider: ProviderModel, startDay: Date, days?: number): Observable<SlotModel[]> {
     startDay.setHours(0, 0, 0, 0);
     const startTimestamp = Timestamp.fromDate(startDay);
-    console.log(startTimestamp.toMillis());
+    // console.log(startTimestamp.toMillis());
     const slotsCollection = collection(
       this.firestore,
       `providers/${provider.uid}/slots`
     ).withConverter(slotModelConverter);
     const bookingsQuery = query(
       slotsCollection,
-      where('daySeconds', '>=', startTimestamp.toMillis()),
-      where('daySeconds', '<=', startTimestamp.toMillis() + (days * 60 * 60 * 24 * 1000))
+      where('dayMillis', '>=', startTimestamp.toMillis()),
+      where('dayMillis', '<=', startTimestamp.toMillis() + (days * 60 * 60 * 24 * 1000))
     );
     return collectionData(bookingsQuery, { idField: 'uid' });
   }

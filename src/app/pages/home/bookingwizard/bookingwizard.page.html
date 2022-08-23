@@ -91,7 +91,7 @@
         </ion-row>
         <ion-row>
           <ion-col>
-            <ion-chip *ngFor="let slot of availableSlots" color="primary" (click)="confirmSlide()">{{ slot }}</ion-chip>
+            <ion-chip *ngFor="let slot of availableSlots" color="primary" (click)="confirmSlide(slot)">{{ slot.toLocaleTimeString() }}</ion-chip>
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -112,7 +112,8 @@
                 <h3>{{this.selectedProvider?.name}}</h3>
               </ion-label>
               <ion-label slot="end">
-                <ion-text>{{this.selectedDate?.start}}</ion-text>
+                <h3>{{ this.selectedDate?.getStartTimeString() }}</h3>
+                <h3>{{ this.selectedDate?.getEndTimeString() }}</h3>
               </ion-label>
             </ion-item>
           </ion-col>

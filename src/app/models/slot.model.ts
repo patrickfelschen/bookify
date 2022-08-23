@@ -2,38 +2,38 @@ import { DocumentSnapshot, SnapshotOptions, Timestamp } from '@angular/fire/fire
 
 export class SlotModel {
   constructor(
-    public daySeconds: number,
-    public slotSeconds: number[],
+    public dayMillis: number,
+    public slotsMillis: number[],
     public uid: string,
   ){}
 
   getStartTimestamp(): Timestamp{
-    let firstSlot = this.slotSeconds[0];
+    let firstSlot = this.dayMillis[0];
     if (firstSlot === undefined){
       firstSlot = 0;
     }
-    return Timestamp.fromMillis((this.daySeconds + firstSlot) * 1000);
+    return Timestamp.fromMillis((this.slotsMillis + firstSlot) * 1000);
   }
 
   getEndTimestamp(): Timestamp {
-    let lastSlot = this.slotSeconds[this.slotSeconds.length - 1];
+    let lastSlot = this.slotsMillis[this.slotsMillis.length - 1];
     if (lastSlot === undefined){
       lastSlot = 0;
     }
-    return Timestamp.fromMillis((this.daySeconds + lastSlot) * 1000);
+    return Timestamp.fromMillis((this.dayMillis + lastSlot) * 1000);
   }
 }
 
 export const slotModelConverter = {
   toFirestore: (model: SlotModel) => ({
-    daySeconds: model.daySeconds,
-    slotSeconds: model.slotSeconds,
+    daySeconds: model.dayMillis,
+    slotSeconds: model.slotsMillis,
   }),
   fromFirestore: (snapshot: DocumentSnapshot, options: SnapshotOptions) => {
     const data = snapshot.data(options);
     return new SlotModel(
-      data.daySeconds,
-      data.slotSeconds,
+      data.dayMillis,
+      data.slotsMillis,
       data.uid
     );
   },

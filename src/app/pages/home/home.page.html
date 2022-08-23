@@ -32,7 +32,8 @@
               <h3>{{booking.provider.name}}</h3>
             </ion-label>
             <ion-label slot="end">
-              <ion-text>???</ion-text>
+              <h3>{{ booking.date?.getStartTimeString() }}</h3>
+              <h3>{{ booking.date?.getEndTimeString() }}</h3>
             </ion-label>
           </ion-item>
         </div>
@@ -60,7 +61,8 @@
               <h3>{{booking.provider.name}}</h3>
             </ion-label>
             <ion-label slot="end">
-              <ion-text>???</ion-text>
+              <h3>{{ booking.date?.getStartTimeString() }}</h3>
+              <h3>{{ booking.date?.getEndTimeString() }}</h3>
             </ion-label>
           </ion-item>
         </div>

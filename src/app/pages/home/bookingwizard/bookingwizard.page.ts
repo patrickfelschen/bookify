@@ -102,11 +102,11 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.next();
   }
 
-  async confirmSlide() {
+  async confirmSlide(date: Date) {
     this.observableSlots.unsubscribe();
     const bookingDate = new DateModel({
-      start: 1 * 60 * 60 * 24 * 1000,
-      end: 2 * 60 * 60 * 24 * 1000,
+      start: Timestamp.fromDate(date).toMillis(),
+      end: Timestamp.fromDate(date).toMillis() + (this.selectedService.duration * this.config.slotSeconds),
     });
     this.selectedDate = bookingDate;
     this.next();
@@ -195,8 +195,8 @@ export class BookingwizardPage implements OnInit, OnDestroy {
         if(slots.length) {
           // Belegte Slots
           for(const slot of slots) {
-            const dayInSeconds = slot.daySeconds;
-            for(const bookingSlot of slot.slotSeconds) {
+            const dayInSeconds = slot.dayMillis;
+            for(const bookingSlot of slot.slotsMillis) {
               this.blockedSlots.push(dayInSeconds + bookingSlot);
             }
           }
@@ -233,13 +233,13 @@ export class BookingwizardPage implements OnInit, OnDestroy {
 
     // Alle übrigen Slots
     for (let i = 0; i < this.availableSlots.length; i++) {
-      // console.log('Current: ' + new Date(this.availableSlots[i]).toLocaleTimeString());
+      console.log('Current: ' + new Date(this.availableSlots[i]).toLocaleTimeString());
       // Schleife von aktuellem Slot bis Slot + Länge der Dienstleistung
       for (let j = i; j < i + this.selectedService.duration; j++) {
         const currentTimestamp = this.availableSlots[j];
         const nextTimestamp = this.availableSlots[j + 1];
 
-        // console.log('Next: ' + new Date(this.availableSlots[j + 1]).toLocaleTimeString());
+        console.log('Next: ' + new Date(this.availableSlots[j + 1]).toLocaleTimeString());
 
         // Wenn aktueller Timestamp + die Länge eines Zeitslots = dem nächsten Timestamp sind, gibt es zwischen diesen keine Unterbrechung
         if (currentTimestamp + slotSize === nextTimestamp) {
@@ -253,8 +253,8 @@ export class BookingwizardPage implements OnInit, OnDestroy {
       if (consecutiveSlots >= this.selectedService.duration) {
         final.push(this.availableSlots[i]);
       }
-      // console.log('Consecutive slots: ' + consecutiveSlots);
-      // console.log('---------------------------');
+      console.log('Consecutive slots: ' + consecutiveSlots);
+      console.log('---------------------------');
       consecutiveSlots = 0;
     }
 
@@ -301,7 +301,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
       if(this.sameDay(Timestamp.fromDate(currentDay), Timestamp.fromMillis(t))) {
         const date = new Date(t);
         const time = date.toLocaleTimeString();
-        tmp.push(time);
+        tmp.push(date);
       }
     }
 

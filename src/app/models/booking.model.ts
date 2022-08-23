@@ -38,7 +38,7 @@ export const bookingModelConverter = {
     const d = snapshot.data(options);
     return new BookingModel({
       uid: d.uid,
-      date: d.date,
+      date: new DateModel({start: d.date.start, end: d.date.end}),
       provider: d.provider,
       service: d.service,
     });
