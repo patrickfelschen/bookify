@@ -13,8 +13,8 @@ import { Observable, Subscription } from 'rxjs';
 })
 export class ProfilePage implements OnInit, OnDestroy {
   mail: string;
-  user: UserModel = new UserModel();
-  userObservable: Subscription;
+  user: UserModel;
+  userObservable: Subscription = Subscription.EMPTY;
 
   constructor(
     private authService: AuthService,
@@ -33,6 +33,11 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.userObservable.unsubscribe();
+  }
+
+  back(){
+    this.userObservable.unsubscribe();
+    this.router.navigateByUrl('home', { replaceUrl: true });
   }
 
   async signOut() {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import SwiperCore, {
   Autoplay,
   Keyboard,
@@ -14,8 +14,10 @@ import { format, parseISO } from 'date-fns';
 import { ProviderModel } from 'src/app/models/provider.model';
 import { Subscription } from 'rxjs';
 import { ServiceModel } from 'src/app/models/service.mode';
-import { BookingConfigModel } from 'src/app/models/bookingconfig.model';
 import { Timestamp } from '@angular/fire/firestore';
+import { SlotConfigModel } from 'src/app/models/slotsconfig.model';
+import { BookingModel } from 'src/app/models/booking.model';
+import { DateModel } from 'src/app/models/date.model';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -24,19 +26,20 @@ SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
   templateUrl: './bookingwizard.page.html',
   styleUrls: ['./bookingwizard.page.scss'],
 })
-export class BookingwizardPage implements OnInit {
+export class BookingwizardPage implements OnInit, OnDestroy {
   @ViewChild('slides') slides: IonSlides;
   @ViewChild('calendar') calendar: IonDatetime;
 
   selectedService: ServiceModel;
   selectedProvider: ProviderModel;
+  selectedDate: DateModel;
   services: ServiceModel[] = [];
   providers: ProviderModel[] = [];
   currentSlide = 0;
-  observableProviders: Subscription;
-  observableServices: Subscription;
-  observableBookings: Subscription;
-  bookingConfig: BookingConfigModel;
+  observableProviders: Subscription = Subscription.EMPTY;
+  observableServices: Subscription = Subscription.EMPTY;
+  observableSlots: Subscription = Subscription.EMPTY;
+  config: SlotConfigModel;
   availableSlots = [];
 
   constructor(
@@ -46,7 +49,7 @@ export class BookingwizardPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    this.bookingConfig = await this.firestoreService.getBookingConfig();
+    this.config = await this.firestoreService.getSlotConfig();
     this.observableServices = this.firestoreService
       .streamAllServices()
       .subscribe((data) => {
@@ -54,7 +57,16 @@ export class BookingwizardPage implements OnInit {
       });
   }
 
+  ngOnDestroy() {
+    this.observableProviders.unsubscribe();
+    this.observableServices.unsubscribe();
+    this.observableSlots.unsubscribe();
+  }
+
   abort() {
+    this.observableProviders.unsubscribe();
+    this.observableServices.unsubscribe();
+    this.observableSlots.unsubscribe();
     this.router.navigateByUrl('home', { replaceUrl: true });
   }
 
@@ -63,35 +75,54 @@ export class BookingwizardPage implements OnInit {
     this.slides.slidePrev();
   }
 
-  chooseProviderSlide(service: ServiceModel) {
-    this.observableServices.unsubscribe();
-    this.selectedService = service;
-    this.observableProviders = this.firestoreService
-      .streamProvidersByService(this.selectedService)
-      .subscribe((data) => {
-        this.providers = data;
-      });
+  next() {
     this.currentSlide++;
     this.slides.slideNext();
   }
 
-  async chooseDateSlide(provider: ProviderModel) {
+  chooseProviderSlide(service: ServiceModel) {
+    this.observableServices.unsubscribe();
+    this.selectedService = service;
+    this.observableProviders = this.firestoreService
+      .streamProvidersByService(service)
+      .subscribe((data) => {
+        this.providers = data;
+      });
+    this.next();
+  }
+
+  chooseDateSlide(provider: ProviderModel) {
     this.observableProviders.unsubscribe();
     if (provider === null) {
       // Beliebig
     }
     this.selectedProvider = provider;
-    this.currentSlide++;
-    this.slides.slideNext();
+    this.next();
   }
 
-  confirmSlide() {
-    this.observableBookings.unsubscribe();
-    this.currentSlide++;
-    this.slides.slideNext();
+  async confirmSlide() {
+    this.observableSlots.unsubscribe();
+    const bookingDate = new DateModel({
+      start: 1 * 60 * 60 * 24 * 1000,
+      end: 2 * 60 * 60 * 24 * 1000,
+    });
+    this.selectedDate = bookingDate;
+    this.next();
   }
 
   async confirmBooking() {
+    const booking = new BookingModel({
+      date: this.selectedDate,
+      provider: this.selectedProvider,
+      service: this.selectedService,
+    });
+
+    const res = await this.firestoreService.createBooking(booking);
+
+    if (res === false) {
+      return;
+    }
+
     const alert = await this.alertController.create({
       header: 'Termin speichern?',
       message:
@@ -113,102 +144,87 @@ export class BookingwizardPage implements OnInit {
         },
       ],
     });
-
     await alert.present();
   }
 
-  getSlotsOfWeekDay(weekDay: string) {
-    let slots;
+  getSlotsOfWeekDay(weekDay: string): number[] {
+    let slots: number[];
     switch (weekDay) {
       case '1':
-        slots = this.bookingConfig.sun;
+        slots = this.config.sun;
         break;
       case '2':
-        slots = this.bookingConfig.mon;
+        slots = this.config.mon;
         break;
       case '3':
-        slots = this.bookingConfig.tue;
+        slots = this.config.tue;
         break;
       case '4':
-        slots = this.bookingConfig.wed;
+        slots = this.config.wed;
         break;
       case '5':
-        slots = this.bookingConfig.thu;
+        slots = this.config.thu;
         break;
       case '6':
-        slots = this.bookingConfig.fri;
+        slots = this.config.fri;
         break;
       case '7':
-        slots = this.bookingConfig.sat;
+        slots = this.config.sat;
         break;
     }
     return slots;
   }
 
   async calendarChange(value) {
-    const dateTime = parseISO(value);
-    dateTime.setHours(0, 0, 0, 0);
-    const timestamp = Timestamp.fromDate(dateTime);
-    console.log(timestamp.seconds);
-    //const date = format(dateTime, 'yyyy-MM-dd');
-    const weekDay = format(dateTime, 'e');
-    //const dayTimeSlots = this.getSlotsOfWeekDay(weekDay);
-    if (this.observableBookings) {
-      this.observableBookings.unsubscribe();
+    const selectedDateTime = parseISO(value);
+    const weekDay = format(selectedDateTime, 'e');
+    const configSlots = []; //this.getSlotsOfWeekDay(weekDay);
+
+    for (let i = 0; i < 86400000; i += 3600000) {
+      configSlots.push(i);
     }
-    this.observableBookings = this.firestoreService
-      .streamBookingsByProvider(this.selectedProvider, timestamp, 1)
-      .subscribe((bookings) => {
+
+    console.log(configSlots);
+
+    if (this.observableSlots) {
+      this.observableSlots.unsubscribe();
+    }
+
+    this.observableSlots = this.firestoreService
+      .streamSlotsByProvider(this.selectedProvider, selectedDateTime, 1)
+      .subscribe((slots) => {
         this.availableSlots = [];
-        console.log(bookings);
-        // if(bookings.length) {
-        //   for(const booking of bookings) {
-        //     for(const dayTimeSlot of dayTimeSlots) {
-        //       const timestamp = new Date(date + ' ' + dayTimeSlot).getTime() / 1000;
-        //       if(timestamp < booking.date.start.seconds || timestamp > booking.date.end.seconds) {
-        //         this.availableSlots.push(dayTimeSlot);
-        //       }
-        //     }
-        //   }
-        // } else {
-        //   this.availableSlots = dayTimeSlots;
-        // }
-        // this.availableSlots = this.filterDuration(date);
-      });
-  }
+        console.log(slots);
 
-  filterDuration(date) {
-    let consecutiveSlots = 0;
-    const slotSizeInMs = this.bookingConfig.slotsize * 60000; // Minuten in Millisekunden
-    const final = [];
-
-    for (let i = 0; i < this.availableSlots.length; i++) {
-      // console.log('Current: ' + this.availableSlots[i]);
-      for (let j = i; j <= i + this.selectedService.duration; j++) {
-        const currentTimestamp = new Date(
-          date + ' ' + this.availableSlots[j]
-        ).getTime();
-        const nextTimestamp = new Date(
-          date + ' ' + this.availableSlots[j + 1]
-        ).getTime();
-
-        // console.log(this.availableSlots[j + 1]);
-
-        if (currentTimestamp + slotSizeInMs === nextTimestamp) {
-          consecutiveSlots++;
-        } else {
-          break;
+        const freeSlots = [];
+        let configSlotTimestamp;
+        for (const configSlot of configSlots) {
+          let isfree = true;
+          // Check if slot is full
+          for (const fullSlot of slots) {
+            for (const slotSeconds of fullSlot.slotSeconds) {
+              configSlotTimestamp = Timestamp.fromMillis(
+                fullSlot.daySeconds + configSlot
+              );
+              const fullSlotTimestamp = Timestamp.fromMillis(
+                fullSlot.daySeconds + slotSeconds
+              );
+              if (configSlotTimestamp.isEqual(fullSlotTimestamp)) {
+                isfree = false;
+              }
+            }
+          }
+          if (isfree === true) {
+            const date = format(configSlotTimestamp.toMillis(), 'HH:mm');
+            freeSlots.push(date);
+          }
+          // Check if duration fit in slots
+          const totalDuration =
+            this.selectedService.duration * this.config.slotSeconds;
+          // ...
         }
-      }
 
-      if (consecutiveSlots >= this.selectedService.duration) {
-        final.push(this.availableSlots[i]);
-      }
-      // console.log('Consecutive slots: ' + consecutiveSlots);
-      // console.log('---------------------------');
-      // consecutiveSlots = 0;
-    }
-
-    return final;
+        this.availableSlots = freeSlots;
+      });
   }
 }

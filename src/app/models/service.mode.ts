@@ -1,14 +1,14 @@
 import { DocumentSnapshot, SnapshotOptions } from '@angular/fire/firestore';
 
 export class ServiceModel {
+  public uid?: string;
   public description: string;
-  public duration: number;
-  public uid: string;
+  public duration?: number;
 
-  constructor(description = '', duration = 1, uid = '') {
+  constructor({ uid = '', description, duration = 1 }) {
+    this.uid = uid;
     this.description = description;
     this.duration = duration;
-    this.uid = uid;
   }
 }
 
@@ -20,6 +20,10 @@ export const serviceModelConverter = {
   }),
   fromFirestore: (snapshot: DocumentSnapshot, options: SnapshotOptions) => {
     const data = snapshot.data(options);
-    return new ServiceModel(data.description, data.duration, data.uid);
+    return new ServiceModel({
+      uid: data.uid,
+      description: data.description,
+      duration: data.duration,
+    });
   },
 };

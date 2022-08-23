@@ -1,21 +1,21 @@
 import { DocumentSnapshot, SnapshotOptions } from '@angular/fire/firestore';
 
-export class BookingConfigModel {
+export class SlotConfigModel {
   constructor(
-    public slotsize: number,
-    public mon: string[],
-    public tue: string[],
-    public wed: string[],
-    public thu: string[],
-    public fri: string[],
-    public sat: string[],
-    public sun: string[]
+    public slotSeconds: number,
+    public mon: number[],
+    public tue: number[],
+    public wed: number[],
+    public thu: number[],
+    public fri: number[],
+    public sat: number[],
+    public sun: number[]
   ) {}
 }
 
-export const bookingConfigModelConverter = {
-  toFirestore: (model: BookingConfigModel) => ({
-    slotsize: model.slotsize,
+export const slotConfigModelConverter = {
+  toFirestore: (model: SlotConfigModel) => ({
+    slotsize: model.slotSeconds,
     mon: model.mon,
     tue: model.tue,
     wed: model.wed,
@@ -26,8 +26,8 @@ export const bookingConfigModelConverter = {
   }),
   fromFirestore: (snapshot: DocumentSnapshot, options: SnapshotOptions) => {
     const data = snapshot.data(options);
-    return new BookingConfigModel(
-      data.slotsize,
+    return new SlotConfigModel(
+      data.slotSeconds,
       data.mon,
       data.tue,
       data.wed,
