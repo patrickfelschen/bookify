@@ -16,6 +16,7 @@ import { Subscription } from 'rxjs';
 import { ServiceModel } from 'src/app/models/service.mode';
 import { BookingConfigModel } from 'src/app/models/bookingconfig.model';
 import { Timestamp } from '@angular/fire/firestore';
+import { WeekDay } from '@angular/common';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -38,6 +39,8 @@ export class BookingwizardPage implements OnInit {
   observableBookings: Subscription;
   bookingConfig: BookingConfigModel;
   availableSlots = [];
+  blockedSlots = [];
+  dayCount = 1;
 
   constructor(
     private router: Router,
@@ -149,50 +152,60 @@ export class BookingwizardPage implements OnInit {
     const dateTime = parseISO(value);
     dateTime.setHours(0, 0, 0, 0);
     const timestamp = Timestamp.fromDate(dateTime);
-    console.log(timestamp.seconds);
-    //const date = format(dateTime, 'yyyy-MM-dd');
-    const weekDay = format(dateTime, 'e');
-    //const dayTimeSlots = this.getSlotsOfWeekDay(weekDay);
+    // console.log(timestamp.seconds);
+    const date = format(dateTime, 'yyyy-MM-dd');
+    // const weekDay = format(dateTime, 'e');
+    // const dayTimeSlots = this.getDayTimeSlots(dateTime, 2);
+    // console.log(dayTimeSlots);
     if (this.observableBookings) {
       this.observableBookings.unsubscribe();
     }
     this.observableBookings = this.firestoreService
-      .streamBookingsByProvider(this.selectedProvider, timestamp, 1)
+      .streamBookingsByProvider(this.selectedProvider, timestamp, this.dayCount)
       .subscribe((bookings) => {
-        this.availableSlots = [];
-        console.log(bookings);
-        // if(bookings.length) {
-        //   for(const booking of bookings) {
-        //     for(const dayTimeSlot of dayTimeSlots) {
-        //       const timestamp = new Date(date + ' ' + dayTimeSlot).getTime() / 1000;
-        //       if(timestamp < booking.date.start.seconds || timestamp > booking.date.end.seconds) {
-        //         this.availableSlots.push(dayTimeSlot);
-        //       }
-        //     }
-        //   }
-        // } else {
-        //   this.availableSlots = dayTimeSlots;
-        // }
-        // this.availableSlots = this.filterDuration(date);
+        // console.log(bookings);
+        this.availableSlots = this.getDayTimeSlots(dateTime, this.dayCount);
+        this.blockedSlots = [];
+
+        if(bookings.length) {
+          // Belegte Slots
+          for(const booking of bookings) {
+            for(const bookingSlot of booking.date.slots) {
+              this.blockedSlots.push(bookingSlot.seconds);
+            }
+          }
+
+          // Belegte Slots von verfügbaren abziehen
+          let slotBlocked = false;
+          for(const slot of this.availableSlots) {
+            for(const blockedTimestamp of this.blockedSlots) {
+              if(slot === blockedTimestamp) {
+                slotBlocked = true;
+              }
+            }
+            if(slotBlocked) {
+              this.availableSlots.splice(this.availableSlots.indexOf(slot), 1);
+            }
+            slotBlocked = false;
+          }
+        }
+        this.availableSlots = this.filterDuration(date);
+        this.availableSlots = this.convertTimestampsToHours(this.availableSlots);
       });
   }
 
   filterDuration(date) {
     let consecutiveSlots = 0;
-    const slotSizeInMs = this.bookingConfig.slotsize * 60000; // Minuten in Millisekunden
+    const slotSizeInMs = this.bookingConfig.slotsize * 60; // Minuten in Millisekunden
     const final = [];
 
     for (let i = 0; i < this.availableSlots.length; i++) {
-      // console.log('Current: ' + this.availableSlots[i]);
+      console.log('Current: ' + new Date(this.availableSlots[i] * 1000).toLocaleTimeString());
       for (let j = i; j <= i + this.selectedService.duration; j++) {
-        const currentTimestamp = new Date(
-          date + ' ' + this.availableSlots[j]
-        ).getTime();
-        const nextTimestamp = new Date(
-          date + ' ' + this.availableSlots[j + 1]
-        ).getTime();
+        const currentTimestamp = this.availableSlots[j];
+        const nextTimestamp = this.availableSlots[j + 1];
 
-        // console.log(this.availableSlots[j + 1]);
+        console.log('Next: ' + new Date(this.availableSlots[j + 1] * 1000).toLocaleTimeString());
 
         if (currentTimestamp + slotSizeInMs === nextTimestamp) {
           consecutiveSlots++;
@@ -204,11 +217,54 @@ export class BookingwizardPage implements OnInit {
       if (consecutiveSlots >= this.selectedService.duration) {
         final.push(this.availableSlots[i]);
       }
-      // console.log('Consecutive slots: ' + consecutiveSlots);
-      // console.log('---------------------------');
-      // consecutiveSlots = 0;
+      console.log('Consecutive slots: ' + consecutiveSlots);
+      console.log('---------------------------');
+      consecutiveSlots = 0;
     }
 
     return final;
+  }
+
+  getDayTimeSlots(dateTime, dayCount) {
+    const weekday = parseInt(format(dateTime, 'e'));
+    const date = format(dateTime, 'yyyy-MM-dd');
+    const dayInSeconds = 86400;
+    const slots = [];
+    let tmp = [];
+
+    for(let i = 0; i <= dayCount; i++) {
+      const index =  ((weekday + i)  - 1) % 7 + 1;
+      tmp = this.getSlotsOfWeekDay(index.toString());
+
+      for(const slot of tmp) {
+        slots.push((Timestamp.fromDate(new Date(date + ' ' + slot)).seconds) + (i * dayInSeconds));
+      }
+
+    }
+
+    return slots;
+  }
+
+  sameDay(timestamp1: Timestamp, timestamp2: Timestamp) {
+    const date1 = new Date(timestamp1.seconds * 1000);
+    const date2 = new Date(timestamp2.seconds * 1000);
+
+    if(date1.toDateString() === date2.toDateString()) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  convertTimestampsToHours(timestamps) {
+    const tmp = [];
+    for(const t of timestamps) {
+      const date = new Date(t * 1000);
+      const time = date.toLocaleTimeString();
+      tmp.push(time);
+    }
+
+    return tmp;
   }
 }
