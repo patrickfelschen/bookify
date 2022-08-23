@@ -91,7 +91,7 @@
         </ion-row>
         <ion-row>
           <ion-col>
-            <ion-chip *ngFor="let slot of availableSlots" color="primary" (click)="confirmSlide(slot)">{{ slot.toLocaleTimeString() }}</ion-chip>
+            <ion-chip *ngFor="let slot of availableSlots | keyvalue" color="primary" (click)="confirmSlide(slot.key)" [disabled]="slot.value.blocked">{{ slot.value.timeString }}</ion-chip>
           </ion-col>
         </ion-row>
       </ion-grid>

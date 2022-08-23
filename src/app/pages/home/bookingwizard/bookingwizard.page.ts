@@ -40,7 +40,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
   observableServices: Subscription = Subscription.EMPTY;
   observableSlots: Subscription = Subscription.EMPTY;
   config: SlotConfigModel;
-  availableSlots = [];
+  availableSlots = new Map();
   blockedSlots = [];
   dayCount = 1;
 
@@ -102,11 +102,11 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.next();
   }
 
-  async confirmSlide(date: Date) {
+  async confirmSlide(date) {
     this.observableSlots.unsubscribe();
     const bookingDate = new DateModel({
-      start: Timestamp.fromDate(date).toMillis(),
-      end: Timestamp.fromDate(date).toMillis() + (this.selectedService.duration * this.config.slotSeconds),
+      start: date,
+      end: date + (this.selectedService.duration * this.config.slotSeconds),
     });
     this.selectedDate = bookingDate;
     this.next();
@@ -202,47 +202,42 @@ export class BookingwizardPage implements OnInit, OnDestroy {
           }
 
           // Belegte Slots von verfügbaren abziehen
-          let slotBlocked = false;
-          for(let i = 0; i < this.availableSlots.length; i++) {
-            // console.log('Slot: ' + new Date(this.availableSlots[i]));
+          // let slotBlocked = false;
+          for(const key of this.availableSlots.keys()) {
+            // console.log('Slot: ' + new Date(slotKey));
             for(const blockedTimestamp of this.blockedSlots) {
               // console.log('Blocked: ' + new Date(blockedTimestamp));
-              if(this.availableSlots[i] === blockedTimestamp) {
-                slotBlocked = true;
+              if(key === blockedTimestamp) {
+                this.availableSlots.get(key).blocked = true;
+                break;
               }
             }
-            if(slotBlocked) {
-              // console.log('Treffer');
-              this.availableSlots.splice(i, 1);
-              i--; // Beim Löschen wird nächstes Element nachgeschoben, i dekrementieren, verhindert Überspringen des Elementes
-            }
-            slotBlocked = false;
+            // slotBlocked = false;
             // console.log('------------------');
           }
         }
-
-        this.availableSlots = this.filterDuration();
-        this.availableSlots = this.convertTimestampsToHours(dateTime);
+        this.filterDuration(dateTime);
+        // console.log(this.availableSlots);
+        // this.convertTimestampsToHours(dateTime);
       });
   }
 
-  filterDuration() {
+  filterDuration(dateTime) {
     let consecutiveSlots = 0;
-    const slotSize = this.config.slotSeconds;
-    const final = [];
+    const slotMillis = (this.selectedService.duration * this.config.slotSeconds);
 
     // Alle übrigen Slots
-    for (let i = 0; i < this.availableSlots.length; i++) {
-      console.log('Current: ' + new Date(this.availableSlots[i]).toLocaleTimeString());
+    for (const key of this.availableSlots.keys()) {
+      if(this.availableSlots.get(key).blocked === true) {
+        continue;
+      }
+      // console.log('Current: ' + new Date(key).toLocaleTimeString());
       // Schleife von aktuellem Slot bis Slot + Länge der Dienstleistung
-      for (let j = i; j < i + this.selectedService.duration; j++) {
-        const currentTimestamp = this.availableSlots[j];
-        const nextTimestamp = this.availableSlots[j + 1];
-
-        console.log('Next: ' + new Date(this.availableSlots[j + 1]).toLocaleTimeString());
-
+      for (let j = key; j < (key + slotMillis); j += this.config.slotSeconds) {
+        // console.log('Next: ' + new Date(j + this.config.slotSeconds).toLocaleTimeString());
         // Wenn aktueller Timestamp + die Länge eines Zeitslots = dem nächsten Timestamp sind, gibt es zwischen diesen keine Unterbrechung
-        if (currentTimestamp + slotSize === nextTimestamp) {
+        const element = this.availableSlots.get(j + this.config.slotSeconds);
+        if (element !== undefined && element.blocked === false) {
           consecutiveSlots++;
         } else {
           break;
@@ -250,15 +245,17 @@ export class BookingwizardPage implements OnInit, OnDestroy {
       }
 
       // Prüfen, ob genug zusammenhängende Slots für die gewählte Dienstleistung gefunden wurden
-      if (consecutiveSlots >= this.selectedService.duration) {
-        final.push(this.availableSlots[i]);
+      if (!(consecutiveSlots >= this.selectedService.duration)) {
+        this.availableSlots.get(key).blocked = true;
       }
-      console.log('Consecutive slots: ' + consecutiveSlots);
-      console.log('---------------------------');
+      if(!this.sameDay(key, Timestamp.fromDate(dateTime).toMillis())) {
+        // console.log('delete: ' + new Date(key));
+        this.availableSlots.delete(key);
+      }
+      // console.log('Consecutive slots: ' + consecutiveSlots);
+      // console.log('---------------------------');
       consecutiveSlots = 0;
     }
-
-    return final;
   }
 
   getDayTimeSlots(dateTime, dayCount) {
@@ -266,7 +263,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     const weekday = parseInt(format(dateTime, 'e'));
     const timestamp = Timestamp.fromDate(dateTime);
     const dayInMs = 86400000; // Millisekunden eines Tages
-    const slots = [];
+    const slots = new Map();
     let tmp = [];
 
     for(let i = 0; i <= dayCount; i++) {
@@ -275,16 +272,17 @@ export class BookingwizardPage implements OnInit, OnDestroy {
       tmp = this.getSlotsOfWeekDay(index.toString());
 
       for(const slot of tmp) {
-        slots.push(((timestamp.toMillis() + slot) + (i * dayInMs)));
+        const key = ((timestamp.toMillis() + slot) + (i * dayInMs));
+        slots.set(key, {blocked: false, timeString: new Date(key).toLocaleTimeString()});
       }
     }
 
     return slots;
   }
 
-  sameDay(timestamp1: Timestamp, timestamp2: Timestamp) {
-    const date1 = new Date(timestamp1.toMillis());
-    const date2 = new Date(timestamp2.toMillis());
+  sameDay(timestamp1, timestamp2) {
+    const date1 = new Date(timestamp1);
+    const date2 = new Date(timestamp2);
 
     if(date1.toDateString() === date2.toDateString()) {
       return true;
@@ -296,10 +294,10 @@ export class BookingwizardPage implements OnInit, OnDestroy {
 
   convertTimestampsToHours(currentDay) {
     const tmp = [];
-    for(const t of this.availableSlots) {
+    for(const [slotKey, slotValue] of this.availableSlots) {
       // Nur freie Zeiten vom aktuellen Tag (gewählt im Kalender) werden angezeigt
-      if(this.sameDay(Timestamp.fromDate(currentDay), Timestamp.fromMillis(t))) {
-        const date = new Date(t);
+      if(this.sameDay(Timestamp.fromDate(currentDay), Timestamp.fromMillis(slotKey))) {
+        const date = new Date(slotKey);
         const time = date.toLocaleTimeString();
         tmp.push(date);
       }
