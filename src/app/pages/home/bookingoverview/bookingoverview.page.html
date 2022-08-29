@@ -43,11 +43,11 @@
     </ion-row>
   </ion-grid>
 </ion-content>
-<ion-footer>
+<ion-footer [hidden]="!this.inFuture">
   <ion-grid>
     <ion-row>
       <ion-col>
-        <ion-button color="secondary" expand="full" [hidden]="!this.inFuture" (click)="cancelBooking()">Stornieren</ion-button>
+        <ion-button color="secondary" expand="full" (click)="cancelBooking()">Stornieren</ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>

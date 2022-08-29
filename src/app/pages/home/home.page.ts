@@ -38,11 +38,11 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   profile(): void {
-    this.router.navigateByUrl('profile', { replaceUrl: true });
+    this.router.navigateByUrl('profile');
   }
 
   bookingOverview(booking): void {
-    this.router.navigateByUrl('bookingoverview', { replaceUrl: true, state: { currentBooking: booking } });
+    this.router.navigateByUrl('bookingoverview', { state: { currentBooking: booking } });
   }
 
   newBooking(): void {

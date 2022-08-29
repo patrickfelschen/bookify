@@ -11,34 +11,28 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content fullscreen="true">
+<ion-content>
   <ion-grid>
     <ion-row>
       <ion-col>
         <div class="nextBookinButtons">
           <ion-text>Nächste Termine</ion-text>
-          <!-- <ion-text color="primary">Alle anzeigen</ion-text> -->
         </div>
       </ion-col>
     </ion-row>
     <ion-row>
       <ion-col>
         <ion-list>
-        <div *ngFor="let booking of this.futureBookings">
-          <ion-item class="booking" button lines="full" (click)="bookingOverview(booking)">
-            <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
-            <ion-label>
-              <h2>{{booking.service.description}}</h2>
-              <h3>{{ booking.date?.getStartTimeString() }} - {{ booking.date?.getEndTimeString() }}</h3>
-            </ion-label>
-          </ion-item>
-        </div>
+          <div *ngFor="let booking of this.futureBookings">
+            <ion-item class="booking" button lines="full" (click)="bookingOverview(booking)">
+              <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
+              <ion-label>
+                <h2>{{booking.service.description}}</h2>
+                <h3>{{booking.date?.getStartTimeString()}} - {{booking.date?.getEndTimeString()}}</h3>
+              </ion-label>
+            </ion-item>
+          </div>
         </ion-list>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>
-        <ion-button class="ion-margin-vertical" expand="full" (click)="newBooking()">Neuer Termin</ion-button>
       </ion-col>
     </ion-row>
     <ion-row>
@@ -50,16 +44,26 @@
       <ion-col>
         <ion-list>
           <div *ngFor="let booking of this.pastBookings">
-          <ion-item class="booking" button lines="full" (click)="bookingOverview(booking)">
-            <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
-            <ion-label>
-              <h2>{{booking.service.description}}</h2>
-              <h3>{{ booking.date?.getStartTimeString() }} - {{ booking.date?.getEndTimeString() }}</h3>
-            </ion-label>
-          </ion-item>
-        </div>
+            <ion-item class="booking" button lines="full" (click)="bookingOverview(booking)">
+              <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
+              <ion-label>
+                <h2>{{booking.service.description}}</h2>
+                <h3>{{booking.date?.getStartTimeString()}} - {{booking.date?.getEndTimeString()}}</h3>
+              </ion-label>
+            </ion-item>
+          </div>
         </ion-list>
       </ion-col>
     </ion-row>
   </ion-grid>
 </ion-content>
+
+<ion-footer color="primary">
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-button expand="full" (click)="newBooking()">Neuer Termin</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-footer>
