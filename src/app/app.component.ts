@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 
 @Component({
@@ -8,6 +9,8 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 })
 export class AppComponent {
   constructor() {
-    StatusBar.setBackgroundColor({color: '#0ca789'});
+    if (Capacitor.isPluginAvailable('StatusBar')) {
+      StatusBar.setBackgroundColor({color: '#0ca789'});
+    }
   }
 }
