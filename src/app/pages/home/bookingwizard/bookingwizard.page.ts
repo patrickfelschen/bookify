@@ -122,7 +122,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.slotDate = date;
     const bookingDate = new DateModel({
       start: date.key,
-      end: date.key + this.selectedService.duration * this.config.slotSeconds,
+      end: date.key + this.selectedService.duration * this.config.slotMillis,
     });
     this.selectedDate = bookingDate;
     this.next();
@@ -142,7 +142,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     for (
       let i = this.selectedDate.start;
       i < this.selectedDate.end;
-      i += this.config.slotSeconds
+      i += this.config.slotMillis
     ) {
       if (isSameDay(i, this.selectedDate.start)) {
         slotsDay1.push(i - dayMillis1);
@@ -227,7 +227,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     if (this.config == null) {
       return;
     }
-    const hours = (duration * this.config.slotSeconds) / 1000 / 60 / 60;
+    const hours = (duration * this.config.slotMillis) / 1000 / 60 / 60;
     if (hours < 1) {
       return hours * 60 + ' Minuten';
     }

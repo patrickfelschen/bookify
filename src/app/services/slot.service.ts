@@ -51,7 +51,7 @@ export class SlotService {
         // console.log('------------------');
       }
     }
-    this.filterDuration(date, slotConfig.slotSeconds, duration);
+    this.filterDuration(date, slotConfig.slotMillis, duration);
     // console.log(this.availableSlots);
     // this.convertTimestampsToHours(dateTime);
     return this.availableSlots;
@@ -73,7 +73,7 @@ export class SlotService {
       console.log('Current: ' + new Date(key).toLocaleTimeString());
       // Schleife von aktuellem Slot bis Slot + Länge der Dienstleistung
       for (let j = key; j < key + slotMillis; j += singleSlotMillis) {
-        console.log('Next: ' + new Date(j + this.config.slotSeconds).toLocaleTimeString());
+        console.log('Next: ' + new Date(j + this.config.slotMillis).toLocaleTimeString());
         // Wenn aktueller Timestamp + die Länge eines Zeitslots = dem nächsten Timestamp sind, gibt es zwischen diesen keine Unterbrechung
         const element = this.availableSlots.get(j);
         if (element !== undefined && element.blocked === false) {

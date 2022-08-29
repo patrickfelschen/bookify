@@ -2,7 +2,7 @@ import { DocumentSnapshot, SnapshotOptions } from '@angular/fire/firestore';
 
 export class SlotConfigModel {
   constructor(
-    public slotSeconds: number,
+    public slotMillis: number,
     public mon: number[],
     public tue: number[],
     public wed: number[],
@@ -15,7 +15,7 @@ export class SlotConfigModel {
 
 export const slotConfigModelConverter = {
   toFirestore: (model: SlotConfigModel) => ({
-    slotsize: model.slotSeconds,
+    slotMillis: model.slotMillis,
     mon: model.mon,
     tue: model.tue,
     wed: model.wed,
@@ -27,7 +27,7 @@ export const slotConfigModelConverter = {
   fromFirestore: (snapshot: DocumentSnapshot, options: SnapshotOptions) => {
     const data = snapshot.data(options);
     return new SlotConfigModel(
-      data.slotSeconds,
+      data.slotMillis,
       data.mon,
       data.tue,
       data.wed,
