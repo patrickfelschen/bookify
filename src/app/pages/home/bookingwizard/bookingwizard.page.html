@@ -17,7 +17,7 @@
 <ion-content fullscreen="true">
   <ion-slides #slides class="swiper-no-swiping">
     <ion-slide>
-      <ion-grid>
+      <ion-grid class="booking">
         <ion-row class="ion-text-start">
           <ion-col>
             <ion-text>Dienstleistung</ion-text>
@@ -27,10 +27,11 @@
           <ion-col>
             <ion-list>
               <div *ngFor="let service of services">
-                <ion-item button class="booking" lines="full" (click)="chooseProviderSlide(service)">
+                <ion-item button lines="full" (click)="chooseProviderSlide(service)">
                   <ion-icon name="briefcase" slot="start" color="primary"></ion-icon>
                   <ion-label>
                     <h2>{{ service.description }}</h2>
+                    <h3>{{ this.calculateDuration(service.duration) }}</h3>
                   </ion-label>
                 </ion-item>
               </div>
@@ -40,7 +41,7 @@
       </ion-grid>
     </ion-slide>
     <ion-slide>
-      <ion-grid>
+      <ion-grid class="booking">
         <ion-row class="ion-text-start">
           <ion-col>
             <ion-text>Dienstleister</ion-text>
@@ -49,14 +50,14 @@
         <ion-row>
           <ion-col>
             <ion-list>
-              <ion-item class="booking" lines="full" button (click)="chooseDateSlide(null)">
+              <ion-item lines="full" button (click)="chooseDateSlide(null)">
                 <ion-icon name="shuffle" slot="start" color="primary"></ion-icon>
                 <ion-label>
                   <h2>Beliebig</h2>
                 </ion-label>
               </ion-item>
               <div *ngFor="let provider of providers">
-                <ion-item class="booking" lines="full" button (click)="chooseDateSlide(provider)">
+                <ion-item lines="full" button (click)="chooseDateSlide(provider)">
                   <ion-icon name="person" slot="start" color="primary"></ion-icon>
                   <ion-label>
                     <h2>{{ provider.name }}</h2>
@@ -69,7 +70,7 @@
       </ion-grid>
     </ion-slide>
     <ion-slide>
-      <ion-grid>
+      <ion-grid class="booking">
         <ion-row class="ion-text-start">
           <ion-col>
             <ion-text>Termin</ion-text>
@@ -82,22 +83,25 @@
             </ion-datetime>
           </ion-col>
         </ion-row>
-        <ion-row class="ion-text-start">
-          <ion-col>
+        <ion-row>
+          <ion-col class="ion-text-start">
             <ion-text>
-              Verfügbare Zeiten
+              Verfügbare Zeiten (Dauer: {{ this.calculateDuration(this.selectedService?.duration) }})
             </ion-text>
           </ion-col>
         </ion-row>
         <ion-row>
           <ion-col>
             <ion-chip *ngFor="let slot of availableSlots | keyvalue" color="primary" (click)="confirmSlide(slot)" [disabled]="slot.value.blocked">{{ slot.value.timeString }}</ion-chip>
+            <ion-text *ngIf="this.availableSlots.size <= 0">
+              Keine Termine vorhanden
+            </ion-text>
           </ion-col>
         </ion-row>
       </ion-grid>
     </ion-slide>
     <ion-slide>
-      <ion-grid>
+      <ion-grid class="booking">
         <ion-row class="ion-justify-content-center ion-margin-vertical">
           <ion-col size="10">
             <ion-img src="../../../assets/svg/bookingconfirm.svg"></ion-img>
@@ -105,15 +109,12 @@
         </ion-row>
         <ion-row>
           <ion-col>
-            <ion-item class="booking" button lines="none">
+            <ion-item button lines="none">
               <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
               <ion-label>
                 <h2>{{this.selectedService?.description}}</h2>
-                <h3>{{this.selectedProvider?.name}}</h3>
-              </ion-label>
-              <ion-label slot="end">
-                <h3>{{ this.selectedDate?.getStartTimeString() }}</h3>
-                <h3>{{ this.selectedDate?.getEndTimeString() }}</h3>
+                <h3>Von: {{ this.selectedDate?.getStartTimeString() }}</h3>
+                <h3>Bis: {{ this.selectedDate?.getEndTimeString() }}</h3>
               </ion-label>
             </ion-item>
           </ion-col>
@@ -122,7 +123,10 @@
           <ion-col>
             <ion-item lines="none">
               <ion-icon name="mail" slot="start" color="primary"></ion-icon>
-              <ion-label>{{this.selectedProvider?.email}}</ion-label>
+              <ion-label>
+                <h2>{{this.selectedProvider?.name}}</h2>
+                {{this.selectedProvider?.email}}
+              </ion-label>
             </ion-item>
             <ion-item lines="none">
               <ion-icon name="call" slot="start" color="primary"></ion-icon>
