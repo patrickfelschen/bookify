@@ -10,7 +10,7 @@ import { IonDatetime, IonicSlides, IonSlides } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { FirestoreService } from 'src/app/services/firestore.service';
-import { isSameDay, parseISO } from 'date-fns';
+import { formatISO, isSameDay, parseISO } from 'date-fns';
 import { ProviderModel } from 'src/app/models/provider.model';
 import { Subscription } from 'rxjs';
 import { ServiceModel } from 'src/app/models/service.mode';
@@ -20,6 +20,8 @@ import { DateModel } from 'src/app/models/date.model';
 import { SlotService } from 'src/app/services/slot.service';
 import { SlotModel } from 'src/app/models/slot.model';
 import { CalendarService } from 'src/app/services/calendar.service';
+import { Capacitor } from '@capacitor/core';
+import { Timestamp } from '@angular/fire/firestore';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -103,6 +105,10 @@ export class BookingwizardPage implements OnInit, OnDestroy {
       // Beliebig
     }
     this.selectedProvider = provider;
+    const a = Timestamp.now();
+    const b = Timestamp.fromMillis(a.toMillis() + 1000 * 60 * 60 * 24);
+    this.ionDatetime.value = formatISO(b.toDate());
+    this.ionDatetime.confirm();
     this.next();
   }
 
@@ -159,29 +165,33 @@ export class BookingwizardPage implements OnInit, OnDestroy {
 
     await this.firestoreService.createBooking(booking, slotmodels);
 
-    const alert = await this.alertController.create({
-      header: 'Termin speichern?',
-      message:
-        'Soll der Termin automatisch in den Telefon Kalender übertragen werden?',
-      buttons: [
-        {
-          text: 'Ok',
-          role: 'confirm',
-          handler: () => {
-            this.calendarService.createBookingEvent(booking);
-            this.router.navigateByUrl('home', { replaceUrl: true });
+    if (Capacitor.isNativePlatform()) {
+      const alert = await this.alertController.create({
+        header: 'Termin speichern?',
+        message:
+          'Soll der Termin automatisch in den Telefon Kalender übertragen werden?',
+        buttons: [
+          {
+            text: 'Ok',
+            role: 'confirm',
+            handler: () => {
+              this.calendarService.createBookingEvent(booking);
+              this.router.navigateByUrl('home', { replaceUrl: true });
+            },
           },
-        },
-        {
-          text: 'Abbrechen',
-          role: 'cancel',
-          handler: () => {
-            this.router.navigateByUrl('home', { replaceUrl: true });
+          {
+            text: 'Abbrechen',
+            role: 'cancel',
+            handler: () => {
+              this.router.navigateByUrl('home', { replaceUrl: true });
+            },
           },
-        },
-      ],
-    });
-    await alert.present();
+        ],
+      });
+      await alert.present();
+    }else{
+      this.router.navigateByUrl('home', { replaceUrl: true });
+    }
   }
 
   async calendarChange(value) {
@@ -209,11 +219,11 @@ export class BookingwizardPage implements OnInit, OnDestroy {
   }
 
   calculateDuration(duration: number) {
-    if(this.config == null) {
+    if (this.config == null) {
       return;
-    };
-    const hours = duration * this.config.slotSeconds / 1000 / 60 / 60;
-    if(hours < 1) {
+    }
+    const hours = (duration * this.config.slotSeconds) / 1000 / 60 / 60;
+    if (hours < 1) {
       return hours * 60 + ' Minuten';
     }
     return hours + ' Stunden';
