@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { BookingModel } from 'src/app/models/booking.model';
+import { FakeDataService } from 'src/app/services/fake-data.service';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { SplashScreen } from '@capacitor/splash-screen';
 
@@ -22,7 +23,8 @@ export class HomePage implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private alertController: AlertController,
-    private firestoreService: FirestoreService
+    private firestoreService: FirestoreService,
+    private fakedataService: FakeDataService
   ) {}
 
   ngOnInit(): void {
@@ -44,6 +46,8 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   profile(): void {
+    //this.fakedataService.generateProviders(40);
+    //this.fakedataService.createSlotConfig();
     this.router.navigateByUrl('profile');
   }
 

@@ -14,7 +14,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content fullscreen="true">
+<ion-content #content>
   <ion-slides #slides class="swiper-no-swiping">
     <ion-slide>
       <ion-grid class="booking">
@@ -30,8 +30,8 @@
                 <ion-item button lines="full" (click)="chooseProviderSlide(service)">
                   <ion-icon name="briefcase" slot="start" color="primary"></ion-icon>
                   <ion-label>
-                    <h2>{{ service.description }}</h2>
-                    <h3>{{ this.calculateDuration(service.duration) }}</h3>
+                    <h2>{{ service?.description }}</h2>
+                    <h3>{{ this.calculateDuration(service?.duration) }}</h3>
                   </ion-label>
                 </ion-item>
               </div>
@@ -109,26 +109,26 @@
         </ion-row>
         <ion-row>
           <ion-col>
-            <ion-item button lines="none">
+            <ion-item lines="full">
               <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
               <ion-label>
-                <h2>{{this.selectedService?.description}}</h2>
-                <h3>Von: {{ this.selectedDate?.getStartTimeString() }}</h3>
-                <h3>Bis: {{ this.selectedDate?.getEndTimeString() }}</h3>
+                <h2>{{ this.selectedService?.description }}</h2>
+                <h3>{{ this.selectedDate?.getStartTimeString() }}</h3>
+                <h3>{{ this.selectedDate?.getEndTimeString() }}</h3>
               </ion-label>
             </ion-item>
           </ion-col>
         </ion-row>
         <ion-row>
           <ion-col>
-            <ion-item lines="none">
+            <ion-item lines="full">
               <ion-icon name="mail" slot="start" color="primary"></ion-icon>
               <ion-label>
                 <h2>{{this.selectedProvider?.name}}</h2>
                 {{this.selectedProvider?.email}}
               </ion-label>
             </ion-item>
-            <ion-item lines="none">
+            <ion-item lines="full">
               <ion-icon name="call" slot="start" color="primary"></ion-icon>
               <ion-label>{{this.selectedProvider?.phone}}</ion-label>
             </ion-item>

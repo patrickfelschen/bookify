@@ -85,7 +85,11 @@ export class FirestoreService {
   }
 
   streamAllServices(): Observable<ServiceModel[]> {
-    return collectionData(this.servicesCollection, { idField: 'uid' });
+    const serviceQuery = query(
+      this.servicesCollection,
+      orderBy('description', 'asc')
+    );
+    return collectionData(serviceQuery, { idField: 'uid' });
   }
 
   streamProvidersByService(service: ServiceModel): Observable<ProviderModel[]> {

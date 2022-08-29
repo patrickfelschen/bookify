@@ -54,6 +54,7 @@
     "@angular/compiler-cli": "^14.0.0",
     "@angular/language-service": "^14.0.0",
     "@capacitor/cli": "4.0.1",
+    "@faker-js/faker": "^7.4.0",
     "@ionic/angular-toolkit": "^6.0.0",
     "@ionic/cli": "6.20.1",
     "@types/jasmine": "~3.6.0",
