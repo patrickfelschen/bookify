@@ -87,10 +87,10 @@ export class SigninPage implements OnInit {
   }
 
   async navigateToResetPassword() {
-    this.router.navigateByUrl('resetpassword', { replaceUrl: true });
+    this.router.navigateByUrl('resetpassword');
   }
 
   async navigateToSignUp() {
-    this.router.navigateByUrl('signup', { replaceUrl: true });
+    this.router.navigateByUrl('signup');
   }
 }

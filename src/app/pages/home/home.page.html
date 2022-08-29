@@ -15,9 +15,12 @@
   <ion-grid>
     <ion-row>
       <ion-col>
-        <div class="nextBookinButtons">
-          <ion-text>Nächste Termine</ion-text>
-        </div>
+        <ion-text>Nächste Termine</ion-text>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-text-center" *ngIf="this.futureBookings?.length <= 0">
+      <ion-col>
+        <h3>Keine Termine vorhanden</h3>
       </ion-col>
     </ion-row>
     <ion-row>
@@ -38,6 +41,11 @@
     <ion-row>
       <ion-col>
         <ion-text>Vergangene Termine</ion-text>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-text-center" *ngIf="this.pastBookings?.length <= 0">
+      <ion-col>
+        <h3>Keine Termine vorhanden</h3>
       </ion-col>
     </ion-row>
     <ion-row>

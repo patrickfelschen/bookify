@@ -46,6 +46,6 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   newBooking(): void {
-    this.router.navigateByUrl('bookingwizard', { replaceUrl: true });
+    this.router.navigateByUrl('bookingwizard');
   }
 }

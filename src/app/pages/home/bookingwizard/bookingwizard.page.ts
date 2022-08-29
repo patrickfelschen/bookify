@@ -57,7 +57,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     private slotService: SlotService,
     private calendarService: CalendarService
   ) {
-    const tomorrow = add(this.today, { days: 1});
+    const tomorrow = add(this.today, { days: 1 });
     this.calendarDate = tomorrow.toISOString();
   }
 
@@ -68,9 +68,9 @@ export class BookingwizardPage implements OnInit, OnDestroy {
       .subscribe((data) => {
         this.services = data;
       });
-      const max = add(this.today, {years: 2});
-      this.ionDatetime.min = this.today.toISOString();
-      this.ionDatetime.max = max.toISOString();
+    const max = add(this.today, { years: 2 });
+    this.ionDatetime.min = this.today.toISOString();
+    this.ionDatetime.max = max.toISOString();
   }
 
   ngOnDestroy() {
@@ -107,12 +107,22 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.next();
   }
 
+  getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+
   chooseDateSlide(provider: ProviderModel) {
     this.observableProviders.unsubscribe();
     if (provider === null) {
-      // Beliebig
+      // Zufällig
+      const index = this.getRandomInt(0, this.providers.length);
+      this.selectedProvider = this.providers[index];
+      console.log(index);
+    } else {
+      this.selectedProvider = provider;
     }
-    this.selectedProvider = provider;
     this.calendarChange(this.calendarDate);
     this.next();
   }
@@ -194,7 +204,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
         ],
       });
       await alert.present();
-    }else{
+    } else {
       this.router.navigateByUrl('home', { replaceUrl: true });
     }
   }

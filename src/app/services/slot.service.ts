@@ -65,15 +65,15 @@ export class SlotService {
     for (const key of this.availableSlots.keys()) {
       if (this.availableSlots.get(key).blocked === true) {
         if (!isSameDay(key, date)) {
-          console.log('delete: ' + new Date(key));
+          //console.log('delete: ' + new Date(key));
           this.availableSlots.delete(key);
         }
         continue;
       }
-      console.log('Current: ' + new Date(key).toLocaleTimeString());
+      //console.log('Current: ' + new Date(key).toLocaleTimeString());
       // Schleife von aktuellem Slot bis Slot + Länge der Dienstleistung
       for (let j = key; j < key + slotMillis; j += singleSlotMillis) {
-        console.log('Next: ' + new Date(j + this.config.slotMillis).toLocaleTimeString());
+        //console.log('Next: ' + new Date(j + this.config.slotMillis).toLocaleTimeString());
         // Wenn aktueller Timestamp + die Länge eines Zeitslots = dem nächsten Timestamp sind, gibt es zwischen diesen keine Unterbrechung
         const element = this.availableSlots.get(j);
         if (element !== undefined && element.blocked === false) {
@@ -91,8 +91,8 @@ export class SlotService {
         // console.log('delete: ' + new Date(key));
         this.availableSlots.delete(key);
       }
-      console.log('Consecutive slots: ' + consecutiveSlots);
-      console.log('---------------------------');
+      //console.log('Consecutive slots: ' + consecutiveSlots);
+      //console.log('---------------------------');
       consecutiveSlots = 0;
     }
   }
