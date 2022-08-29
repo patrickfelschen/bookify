@@ -6,7 +6,7 @@ import SwiperCore, {
   Scrollbar,
   Zoom,
 } from 'swiper';
-import { IonDatetime, IonicSlides, IonSlides } from '@ionic/angular';
+import { IonContent, IonDatetime, IonicSlides, IonSlides } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { FirestoreService } from 'src/app/services/firestore.service';
@@ -21,7 +21,6 @@ import { SlotService } from 'src/app/services/slot.service';
 import { SlotModel } from 'src/app/models/slot.model';
 import { CalendarService } from 'src/app/services/calendar.service';
 import { Capacitor } from '@capacitor/core';
-import { Timestamp } from '@angular/fire/firestore';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -31,6 +30,7 @@ SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
   styleUrls: ['./bookingwizard.page.scss'],
 })
 export class BookingwizardPage implements OnInit, OnDestroy {
+  @ViewChild('content') content: IonContent;
   @ViewChild('slides') ionSlides: IonSlides;
   @ViewChild('calendar') ionDatetime: IonDatetime;
 
@@ -89,11 +89,13 @@ export class BookingwizardPage implements OnInit, OnDestroy {
   back() {
     this.currentSlide--;
     this.ionSlides.slidePrev();
+    this.content.scrollToTop();
   }
 
   next() {
     this.currentSlide++;
     this.ionSlides.slideNext();
+    this.content.scrollToTop();
   }
 
   chooseProviderSlide(service: ServiceModel) {
@@ -107,7 +109,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.next();
   }
 
-  getRandomInt(min, max) {
+  getRandomInt(min: number, max: number): number {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min;
@@ -187,7 +189,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
           'Soll der Termin automatisch in den Telefon Kalender übertragen werden?',
         buttons: [
           {
-            text: 'Ok',
+            text: 'Ja',
             role: 'confirm',
             handler: () => {
               this.calendarService.createBookingEvent(booking);
@@ -195,7 +197,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
             },
           },
           {
-            text: 'Abbrechen',
+            text: 'Nein',
             role: 'cancel',
             handler: () => {
               this.router.navigateByUrl('home', { replaceUrl: true });

@@ -15,8 +15,7 @@ export class ServiceModel {
 export const serviceModelConverter = {
   toFirestore: (model: ServiceModel) => ({
     description: model.description,
-    duration: model.duration,
-    uid: model.uid,
+    duration: model.duration
   }),
   fromFirestore: (snapshot: DocumentSnapshot, options: SnapshotOptions) => {
     const data = snapshot.data(options);
