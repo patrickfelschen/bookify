@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { BookingModel } from 'src/app/models/booking.model';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { AlertController } from '@ionic/angular';
+import { Timestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-bookingoverview',
@@ -10,17 +11,19 @@ import { AlertController } from '@ionic/angular';
   styleUrls: ['./bookingoverview.page.scss'],
 })
 export class BookingoverviewPage implements OnInit {
+  inFuture: boolean;
 
   currentBooking: BookingModel;
 
   constructor(private router: Router, private firestoreService: FirestoreService, private alertController: AlertController) {
     if(this.router.getCurrentNavigation().extras.state) {
       this.currentBooking = this.router.getCurrentNavigation().extras.state.currentBooking;
+      this.inFuture = this.currentBooking.date.start > Timestamp.fromDate(new Date()).toMillis();
     }
-
   }
 
   ngOnInit() {
+    console.log(this.inFuture);
   }
 
   async cancelBooking() {

@@ -16,7 +16,7 @@
     <ion-row>
       <ion-col>
         <div class="nextBookinButtons">
-          <ion-text>Nächster Termin</ion-text>
+          <ion-text>Nächste Termine</ion-text>
           <!-- <ion-text color="primary">Alle anzeigen</ion-text> -->
         </div>
       </ion-col>
@@ -29,11 +29,7 @@
             <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
             <ion-label>
               <h2>{{booking.service.description}}</h2>
-              <h3>{{booking.provider.name}}</h3>
-            </ion-label>
-            <ion-label slot="end">
-              <h3>{{ booking.date?.getStartTimeString() }}</h3>
-              <h3>{{ booking.date?.getEndTimeString() }}</h3>
+              <h3>{{ booking.date?.getStartTimeString() }} - {{ booking.date?.getEndTimeString() }}</h3>
             </ion-label>
           </ion-item>
         </div>
@@ -58,11 +54,7 @@
             <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
             <ion-label>
               <h2>{{booking.service.description}}</h2>
-              <h3>{{booking.provider.name}}</h3>
-            </ion-label>
-            <ion-label slot="end">
-              <h3>{{ booking.date?.getStartTimeString() }}</h3>
-              <h3>{{ booking.date?.getEndTimeString() }}</h3>
+              <h3>{{ booking.date?.getStartTimeString() }} - {{ booking.date?.getEndTimeString() }}</h3>
             </ion-label>
           </ion-item>
         </div>

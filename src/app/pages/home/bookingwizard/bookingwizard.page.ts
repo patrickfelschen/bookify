@@ -223,4 +223,15 @@ export class BookingwizardPage implements OnInit, OnDestroy {
   isValidDay(dateString: string) {
     return new Date(dateString) >= new Date();
   }
+
+  calculateDuration(duration: number) {
+    if(this.config == null) {
+      return;
+    };
+    const hours = duration * this.config.slotSeconds / 1000 / 60 / 60;
+    if(hours < 1) {
+      return hours * 60 + ' Minuten';
+    }
+    return hours + ' Stunden';
+  }
 }
