@@ -10,7 +10,7 @@ import { IonDatetime, IonicSlides, IonSlides } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { FirestoreService } from 'src/app/services/firestore.service';
-import { formatISO, isSameDay, parseISO } from 'date-fns';
+import { add, isSameDay, parseISO } from 'date-fns';
 import { ProviderModel } from 'src/app/models/provider.model';
 import { Subscription } from 'rxjs';
 import { ServiceModel } from 'src/app/models/service.mode';
@@ -47,6 +47,8 @@ export class BookingwizardPage implements OnInit, OnDestroy {
   dayCount = 1;
   availableSlots = new Map();
   slotDate;
+  calendarDate: string;
+  today: Date = new Date();
 
   constructor(
     private router: Router,
@@ -54,7 +56,10 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     private firestoreService: FirestoreService,
     private slotService: SlotService,
     private calendarService: CalendarService
-  ) {}
+  ) {
+    const tomorrow = add(this.today, { days: 1});
+    this.calendarDate = tomorrow.toISOString();
+  }
 
   async ngOnInit() {
     this.config = await this.firestoreService.getSlotConfig();
@@ -63,6 +68,9 @@ export class BookingwizardPage implements OnInit, OnDestroy {
       .subscribe((data) => {
         this.services = data;
       });
+      const max = add(this.today, {years: 2});
+      this.ionDatetime.min = this.today.toISOString();
+      this.ionDatetime.max = max.toISOString();
   }
 
   ngOnDestroy() {
@@ -105,10 +113,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
       // Beliebig
     }
     this.selectedProvider = provider;
-    const a = Timestamp.now();
-    const b = Timestamp.fromMillis(a.toMillis() + 1000 * 60 * 60 * 24);
-    this.ionDatetime.value = formatISO(b.toDate());
-    this.ionDatetime.confirm();
+    this.calendarChange(this.calendarDate);
     this.next();
   }
 

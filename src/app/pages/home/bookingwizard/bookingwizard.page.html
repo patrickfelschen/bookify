@@ -78,8 +78,8 @@
         </ion-row>
         <ion-row>
           <ion-col>
-            <ion-datetime #calendar (ionChange)="calendarChange(calendar.value)" color="primary" locale="de-DE"
-              presentation="date" displayFormat="YYYY" firstDayOfWeek="1" [isDateEnabled]="isValidDay">
+            <ion-datetime [(ngModel)]="this.calendarDate" #calendar (ionChange)="calendarChange(calendar.value)" color="primary" locale="de-DE"
+              presentation="date" displayFormat="YYYY" firstDayOfWeek="1" [isDateEnabled]="isValidDay" max="2099-12-31">
             </ion-datetime>
           </ion-col>
         </ion-row>
