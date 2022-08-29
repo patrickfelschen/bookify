@@ -5,6 +5,7 @@ import {
   collection,
   collectionData,
   CollectionReference,
+  deleteDoc,
   doc,
   docData,
   DocumentReference,
@@ -133,6 +134,30 @@ export class FirestoreService {
       console.log(error);
       return false;
     }
+  }
+
+  async deleteUserBooking(booking: BookingModel) {
+    const authUser = this.getCurrentAuthUser();
+    const userBookingDocRef = doc(this.firestore, `users/${authUser.uid}/bookings/${booking.uid}`);
+    try {
+      const docSnap = await deleteDoc(userBookingDocRef);
+    } catch(error) {
+      console.log(error);
+    }
+    const providerSlotsCollection = collection(
+      this.firestore,
+      `providers/${booking.provider.uid}/slots`
+    );
+    const bookingQuery = query(
+      providerSlotsCollection,
+      where('bookingUid', '==', booking.uid)
+    );
+    collectionData(bookingQuery, { idField: 'uid' }).subscribe(docs => {
+      docs.forEach(async slotDoc => {
+        const slotDocRef = doc(this.firestore, `providers/${booking.provider.uid}/slots/${slotDoc.uid}`);
+        await deleteDoc(slotDocRef);
+      });
+    });
   }
 
   streamPastBooking() {
