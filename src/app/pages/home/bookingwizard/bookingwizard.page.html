@@ -78,7 +78,7 @@
         <ion-row>
           <ion-col>
             <ion-datetime #calendar (ionChange)="calendarChange(calendar.value)" color="primary" locale="de-DE"
-              presentation="date" displayFormat="YYYY" [isDateEnabled]="isValidDay">
+              presentation="date" displayFormat="YYYY" firstDayOfWeek="1" [isDateEnabled]="isValidDay">
             </ion-datetime>
           </ion-col>
         </ion-row>
