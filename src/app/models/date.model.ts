@@ -9,6 +9,14 @@ export class DateModel {
     this.end = end;
   }
 
+  get startDate() {
+    return new Date(this.start);
+  }
+
+  get endDate() {
+    return new Date(this.end);
+  }
+
   getStartTimeString() {
     return new Date(this.start).toLocaleString();
   }

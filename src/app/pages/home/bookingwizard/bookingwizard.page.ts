@@ -20,6 +20,7 @@ import { BookingModel } from 'src/app/models/booking.model';
 import { DateModel } from 'src/app/models/date.model';
 import { SlotService } from 'src/app/services/slot.service';
 import { SlotModel } from 'src/app/models/slot.model';
+import { Calendar } from '@awesome-cordova-plugins/calendar/ngx';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -29,8 +30,8 @@ SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
   styleUrls: ['./bookingwizard.page.scss'],
 })
 export class BookingwizardPage implements OnInit, OnDestroy {
-  @ViewChild('slides') slides: IonSlides;
-  @ViewChild('calendar') calendar: IonDatetime;
+  @ViewChild('slides') ionSlides: IonSlides;
+  @ViewChild('calendar') ionDatetime: IonDatetime;
 
   selectedService: ServiceModel;
   selectedProvider: ProviderModel;
@@ -50,7 +51,8 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     private router: Router,
     private alertController: AlertController,
     private firestoreService: FirestoreService,
-    private slotService: SlotService
+    private slotService: SlotService,
+    private calendar: Calendar
   ) {}
 
   async ngOnInit() {
@@ -77,12 +79,12 @@ export class BookingwizardPage implements OnInit, OnDestroy {
 
   back() {
     this.currentSlide--;
-    this.slides.slidePrev();
+    this.ionSlides.slidePrev();
   }
 
   next() {
     this.currentSlide++;
-    this.slides.slideNext();
+    this.ionSlides.slideNext();
   }
 
   chooseProviderSlide(service: ServiceModel) {
@@ -127,7 +129,10 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     const slotsDay2 = [];
     const dayMillis1 = this.slotDate.value.dayMillis;
     const dayMillis2 = this.slotDate.value.dayMillis + 1000 * 60 * 60 * 24;
-    for (let i = this.selectedDate.start; i < this.selectedDate.end; i += this.config.slotSeconds
+    for (
+      let i = this.selectedDate.start;
+      i < this.selectedDate.end;
+      i += this.config.slotSeconds
     ) {
       if (isSameDay(i, this.selectedDate.start)) {
         slotsDay1.push(i - dayMillis1);
@@ -164,6 +169,22 @@ export class BookingwizardPage implements OnInit, OnDestroy {
           text: 'Ok',
           role: 'confirm',
           handler: () => {
+            this.calendar
+              .createEventInteractively(
+                booking.service.description,
+                '',
+                booking.provider.email,
+                booking.date.startDate,
+                booking.date.endDate
+              )
+              .then(
+                (msg) => {
+                  console.log(msg);
+                },
+                (err) => {
+                  console.log(err);
+                }
+              );
             this.router.navigateByUrl('home', { replaceUrl: true });
           },
         },

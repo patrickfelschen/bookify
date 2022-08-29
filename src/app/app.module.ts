@@ -11,6 +11,7 @@ import { environment } from '../environments/environment';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { NativeGeocoder} from '@awesome-cordova-plugins/native-geocoder/ngx';
+import { Calendar } from '@awesome-cordova-plugins/calendar/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -24,7 +25,8 @@ import { NativeGeocoder} from '@awesome-cordova-plugins/native-geocoder/ngx';
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    NativeGeocoder
+    NativeGeocoder,
+    Calendar
   ],
   bootstrap: [AppComponent],
 })
