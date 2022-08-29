@@ -21,6 +21,8 @@ import { DateModel } from 'src/app/models/date.model';
 import { SlotService } from 'src/app/services/slot.service';
 import { SlotModel } from 'src/app/models/slot.model';
 import { Calendar } from '@awesome-cordova-plugins/calendar/ngx';
+import { Capacitor } from '@capacitor/core';
+import { CalendarService } from 'src/app/services/calendar.service';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
 
@@ -52,7 +54,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     private alertController: AlertController,
     private firestoreService: FirestoreService,
     private slotService: SlotService,
-    private calendar: Calendar
+    private calendarService: CalendarService
   ) {}
 
   async ngOnInit() {
@@ -169,22 +171,9 @@ export class BookingwizardPage implements OnInit, OnDestroy {
           text: 'Ok',
           role: 'confirm',
           handler: () => {
-            this.calendar
-              .createEventInteractively(
-                booking.service.description,
-                '',
-                booking.provider.email,
-                booking.date.startDate,
-                booking.date.endDate
-              )
-              .then(
-                (msg) => {
-                  console.log(msg);
-                },
-                (err) => {
-                  console.log(err);
-                }
-              );
+            if (Capacitor.isPluginAvailable('Calendar')) {
+              this.calendarService.createBookingEvent(booking);
+            }
             this.router.navigateByUrl('home', { replaceUrl: true });
           },
         },
