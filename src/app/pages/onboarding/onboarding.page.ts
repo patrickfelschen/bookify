@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonSlides } from '@ionic/angular';
 import SwiperCore, { Autoplay, Keyboard, Pagination, Scrollbar, Zoom } from 'swiper';
+import { SplashScreen } from '@capacitor/splash-screen';
 import { IonicSlides } from '@ionic/angular';
 
 SwiperCore.use([Autoplay, Keyboard, Pagination, Scrollbar, Zoom, IonicSlides]);
@@ -23,13 +24,15 @@ export class OnboardingPage implements OnInit {
     }
   };
 
-  constructor(private router: Router) { }
+  constructor(private router: Router) {
+  }
 
   ngOnInit() {
   }
 
   // Autoplay nach Laden der Page starten
   ionViewWillEnter() {
+    SplashScreen.hide();
     this.onboardingSlides.startAutoplay();
   }
 

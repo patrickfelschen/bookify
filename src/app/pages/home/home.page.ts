@@ -5,6 +5,8 @@ import { Subscription } from 'rxjs';
 import { BookingModel } from 'src/app/models/booking.model';
 import { FakeDataService } from 'src/app/services/fake-data.service';
 import { FirestoreService } from 'src/app/services/firestore.service';
+import { SplashScreen } from '@capacitor/splash-screen';
+
 
 @Component({
   selector: 'app-home',
@@ -32,6 +34,10 @@ export class HomePage implements OnInit, OnDestroy {
     this.observablePastBookings = this.firestoreService.streamPastBooking().subscribe(bookings =>{
       this.pastBookings = bookings;
     });
+  }
+
+  ionViewWillEnter() {
+    SplashScreen.hide();
   }
 
   ngOnDestroy(): void {
