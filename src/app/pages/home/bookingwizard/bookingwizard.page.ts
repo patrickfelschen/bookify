@@ -171,9 +171,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
           text: 'Ok',
           role: 'confirm',
           handler: () => {
-            if (Capacitor.isPluginAvailable('Calendar')) {
-              this.calendarService.createBookingEvent(booking);
-            }
+            this.calendarService.createBookingEvent(booking);
             this.router.navigateByUrl('home', { replaceUrl: true });
           },
         },
