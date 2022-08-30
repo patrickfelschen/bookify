@@ -33,16 +33,29 @@ export class FirestoreService {
   private servicesCollection: CollectionReference<ServiceModel>;
   private providersCollection: CollectionReference<ProviderModel>;
 
+  /**
+   * Initialisieren der Collections mit den dazugehörigen Convertern
+   */
   constructor(private auth: Auth, private firestore: Firestore) {
     this.usersCollection = collection(this.firestore, 'users').withConverter(userModelConverter);
     this.servicesCollection = collection(this.firestore, 'services').withConverter(serviceModelConverter);
     this.providersCollection = collection(this.firestore, 'providers').withConverter(providerModelConverter);
   }
 
+  /**
+   * Benutzer aus Firebase Auth auslesen
+   *
+   * @returns aktueller Benutzer
+   */
   getCurrentAuthUser() {
     return this.auth.currentUser;
   }
 
+  /**
+   * Prüfen ob Benutzer Profil existiert
+   *
+   * @returns true wenn Profil existiert, ansonsten false
+   */
   async userProfileExists() {
     const authUser = this.getCurrentAuthUser();
     const userDocRef = doc(this.usersCollection, authUser.uid);
@@ -55,6 +68,12 @@ export class FirestoreService {
     }
   }
 
+  /**
+   * Benutzer Profil in Firestore anlegen
+   *
+   * @param user Benutzer Profil Daten
+   * @returns true wenn Vorgang erfolgreich, ansonsten false
+   */
   async createUserProfile(user: UserModel) {
     const authUser = this.getCurrentAuthUser();
     const userDocRef = doc(this.usersCollection, authUser.uid);
@@ -67,12 +86,22 @@ export class FirestoreService {
     }
   }
 
+  /**
+   * Liefert einen Stream des aktuellen Benutzer Profils zurück
+   *
+   * @returns Stream des Profils
+   */
   streamUserProfile(): Observable<UserModel> {
     const authUser = this.getCurrentAuthUser();
     const userDocRef = doc(this.usersCollection, authUser.uid);
     return docData(userDocRef, { idField: 'uid' });
   }
 
+  /**
+   * Liefert einmalig die Zeitfenster Einstellungen zurück
+   *
+   * @returns Einstellungen
+   */
   async getSlotConfig(): Promise<SlotConfigModel> {
     const configDocRef = doc(this.firestore, `configs/slotconfig`).withConverter(slotConfigModelConverter);
     try {
@@ -84,6 +113,11 @@ export class FirestoreService {
     }
   }
 
+  /**
+   * Liefert einen Stream aller Dienstleistungen zurück
+   *
+   * @returns Stream aller Dienstleistungen
+   */
   streamAllServices(): Observable<ServiceModel[]> {
     const serviceQuery = query(
       this.servicesCollection,
@@ -92,6 +126,12 @@ export class FirestoreService {
     return collectionData(serviceQuery, { idField: 'uid' });
   }
 
+  /**
+   * Liefert einen Stream von Dienstleistern gefiltert nach Dienstleistungen zurück
+   *
+   * @param service Dienstleistung, nach der gefiltert werden soll
+   * @returns Stream der zuständigen Dienstleister
+   */
   streamProvidersByService(service: ServiceModel): Observable<ProviderModel[]> {
     const providerQuery = query(
       this.providersCollection,
@@ -101,6 +141,14 @@ export class FirestoreService {
     return collectionData(providerQuery, { idField: 'uid' });
   }
 
+  /**
+   * Liefert einen Stream von belegten Zeitfenstern eines Dienstleisters zurück
+   *
+   * @param provider gewählter Dienstleister
+   * @param startDay Angabe von welchem Tag die Zeitfenster kommen sollen
+   * @param days Anzahl zusätzlicher Tage nach "startDate"
+   * @returns belegte Zeitfenster
+   */
   streamSlotsByProvider(provider: ProviderModel, startDay: Date, days?: number): Observable<SlotModel[]> {
     startDay.setHours(0, 0, 0, 0);
     const startTimestamp = Timestamp.fromDate(startDay);
@@ -117,6 +165,14 @@ export class FirestoreService {
     return collectionData(bookingsQuery, { idField: 'uid' });
   }
 
+  /**
+   * Erstellt eine Buchung in der User Booking Collection und
+   * Einträge der belegten Zeitfenster im Provider.
+   *
+   * @param booking Buchungsinformationen
+   * @param slots belegte Slots (pro Tag)
+   * @returns true wenn Vorgang erfolgreich, ansonsten false
+   */
   async createBooking(booking: BookingModel, slots: SlotModel[]) {
     const authUser = this.getCurrentAuthUser();
     const userBookingsCollection = collection(
@@ -140,6 +196,12 @@ export class FirestoreService {
     }
   }
 
+  /**
+   * Entfernt eine Buchung aus der User Booking Collection.
+   * Zudem werden die belegten Zeitfenster des Providers wieder frei gegeben (gelöscht).
+   *
+   * @param booking zu löschende Buchung
+   */
   async deleteUserBooking(booking: BookingModel) {
     const authUser = this.getCurrentAuthUser();
     const userBookingDocRef = doc(this.firestore, `users/${authUser.uid}/bookings/${booking.uid}`);
@@ -164,7 +226,12 @@ export class FirestoreService {
     });
   }
 
-  streamPastBooking() {
+  /**
+   * Liefert einen Stream der vergangenen Buchungen eines Benutzers zurück
+   *
+   * @returns vergangene Buchungen
+   */
+  streamPastBooking(): Observable<BookingModel[]> {
     const authUser = this.getCurrentAuthUser();
     const userBookingsCollection = collection(
       this.firestore,
@@ -177,7 +244,12 @@ export class FirestoreService {
     return collectionData(bookingQuery, {idField: 'uid'});
   }
 
-  streamFutureBooking() {
+  /**
+   * Liefert einen Stream der kommenden Buchungen eines Benutzers zurück
+   *
+   * @returns kommende Buchungen
+   */
+  streamFutureBooking(): Observable<BookingModel[]> {
     const authUser = this.getCurrentAuthUser();
     const userBookingsCollection = collection(
       this.firestore,
