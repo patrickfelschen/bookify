@@ -10,7 +10,6 @@ import { AuthService } from '../../../services/auth.service';
   styleUrls: ['./resetpassword.page.scss'],
 })
 export class ResetpasswordPage implements OnInit {
-
   credentials: FormGroup;
 
   constructor(
@@ -25,12 +24,19 @@ export class ResetpasswordPage implements OnInit {
     return this.credentials.get('email');
   }
 
+  /**
+   * Initialisierung der Validators für die E-Mail
+   */
   ngOnInit() {
     this.credentials = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
     });
   }
 
+  /**
+   * E-Mail an Benutzer senden, um ein neues Passwort zu setzen.
+   * Der Benutzer erhält eine Rückmeldung, ob der Vorgang erfolgreich war.
+   */
   async resetPassword() {
     // Ladeanzeige anzeigen
     const loading = await this.loadingController.create();
@@ -41,7 +47,7 @@ export class ResetpasswordPage implements OnInit {
     await loading.dismiss();
     // Status prüfen
     if (status === true) {
-      this.router.navigateByUrl('signin', { replaceUrl: true });
+      this.navigateToSignIn();
     } else {
       this.showAlert('Zurücksetzen fehlgeschlagen', 'Versuche es erneut!');
     }
@@ -62,8 +68,10 @@ export class ResetpasswordPage implements OnInit {
     await alert.present();
   }
 
-  async navigateToSignIn() {
+  /**
+   * Navigiert zum Anmelde Screen
+   */
+  navigateToSignIn() {
     this.router.navigateByUrl('signin', { replaceUrl: true });
   }
-
 }

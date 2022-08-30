@@ -113,14 +113,13 @@ export class CompleteprofilePage implements OnInit {
   async createProfile() {
     const loading = await this.loadingController.create();
     const userModel = new UserModel({
-        firstname: this.firstname.value,
-        lastname: this.lastname.value,
-        addressline1: this.addressline1.value,
-        addressline2: this.addressline2.value,
-        postalcode: this.postalcode.value,
-        city: this.city.value
-      }
-    );
+      firstname: this.firstname.value,
+      lastname: this.lastname.value,
+      addressline1: this.addressline1.value,
+      addressline2: this.addressline2.value,
+      postalcode: this.postalcode.value,
+      city: this.city.value,
+    });
     const result = await this.firestoreService.createUserProfile(userModel);
     await loading.dismiss();
     if (result === false) {
