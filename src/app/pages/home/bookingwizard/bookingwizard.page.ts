@@ -58,27 +58,33 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     private calendarService: CalendarService
   ) {
     const tomorrow = add(this.today, { days: 1 });
+    // Dient als initialer Wert des Kalenders
     this.calendarDate = tomorrow.toISOString();
   }
 
   async ngOnInit() {
+    // Abrufen der Konfiguration
     this.config = await this.firestoreService.getSlotConfig();
+    // Abrufen verfügbarer Dienstleistungen
     this.observableServices = this.firestoreService
       .streamAllServices()
       .subscribe((data) => {
         this.services = data;
       });
+    // Festlegen der Zeitspanne des Kalenders
     const max = add(this.today, { years: 2 });
     this.ionDatetime.min = this.today.toISOString();
     this.ionDatetime.max = max.toISOString();
   }
 
+  // Abmelden von Live-Daten beim Schließen des Screens
   ngOnDestroy() {
     this.observableProviders.unsubscribe();
     this.observableServices.unsubscribe();
     this.observableSlots.unsubscribe();
   }
 
+  // Bricht den Buchungsvorgang ab und navigiert zurück zum Home Screen
   abort() {
     this.observableProviders.unsubscribe();
     this.observableServices.unsubscribe();
@@ -86,18 +92,21 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.router.navigateByUrl('home', { replaceUrl: true });
   }
 
+  // Zurück navigieren
   back() {
     this.currentSlide--;
     this.ionSlides.slidePrev();
     this.content.scrollToTop();
   }
 
+  // Vorwärts navigieren
   next() {
     this.currentSlide++;
     this.ionSlides.slideNext();
     this.content.scrollToTop();
   }
 
+  // Setzt die gewählte Dienstleistung und ruft verfügbare Dienstleister ab
   chooseProviderSlide(service: ServiceModel) {
     this.observableServices.unsubscribe();
     this.selectedService = service;
@@ -109,12 +118,14 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.next();
   }
 
+  // Liefert zufällige Ganzzahl zwischeh min und max
   getRandomInt(min: number, max: number): number {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min;
   }
 
+  // Setzt den gewählten Dienstleister und öffnet Kalenderübersicht
   chooseDateSlide(provider: ProviderModel) {
     this.observableProviders.unsubscribe();
     if (provider === null) {
@@ -129,6 +140,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.next();
   }
 
+  // Setzt den gewählen Termin und öffnet Gesamtübersicht
   async confirmSlide(date) {
     this.observableSlots.unsubscribe();
     this.slotDate = date;
@@ -141,16 +153,19 @@ export class BookingwizardPage implements OnInit, OnDestroy {
   }
 
   async confirmBooking() {
+    // Erstellen eines neuen Bookings mit den gewählten Daten
     const booking = new BookingModel({
       date: this.selectedDate,
       provider: this.selectedProvider,
       service: this.selectedService,
     });
 
+    // Berechnung der gewählten Zeitslots
     const slotsDay1 = [];
     const slotsDay2 = [];
     const dayMillis1 = this.slotDate.value.dayMillis;
     const dayMillis2 = this.slotDate.value.dayMillis + 1000 * 60 * 60 * 24;
+    // Falls Termin über zwei Tage geht, sind zwei Arrays mit zugehörigen Slots notwendig
     for (
       let i = this.selectedDate.start;
       i < this.selectedDate.end;
