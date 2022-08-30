@@ -77,14 +77,18 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.ionDatetime.max = max.toISOString();
   }
 
-  // Abmelden von Live-Daten beim Schließen des Screens
+  /**
+   * Abmelden von Live-Daten beim Schließen des Screens
+   */
   ngOnDestroy() {
     this.observableProviders.unsubscribe();
     this.observableServices.unsubscribe();
     this.observableSlots.unsubscribe();
   }
 
-  // Bricht den Buchungsvorgang ab und navigiert zurück zum Home Screen
+  /**
+   * Bricht den Buchungsvorgang ab und navigiert zurück zum Home Screen
+   */
   abort() {
     this.observableProviders.unsubscribe();
     this.observableServices.unsubscribe();
@@ -92,21 +96,28 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.router.navigateByUrl('home', { replaceUrl: true });
   }
 
-  // Zurück navigieren
+  /**
+   * Zurück navigieren
+   */
   back() {
     this.currentSlide--;
     this.ionSlides.slidePrev();
     this.content.scrollToTop();
   }
 
-  // Vorwärts navigieren
+  /**
+   * Vorwärts navigieren
+   */
   next() {
     this.currentSlide++;
     this.ionSlides.slideNext();
     this.content.scrollToTop();
   }
 
-  // Setzt die gewählte Dienstleistung und ruft verfügbare Dienstleister ab
+  /**
+   * Setzt die gewählte Dienstleistung und ruft verfügbare Dienstleister ab
+   * @param service Gewählter Service
+   */
   chooseProviderSlide(service: ServiceModel) {
     this.observableServices.unsubscribe();
     this.selectedService = service;
@@ -118,14 +129,21 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.next();
   }
 
-  // Liefert zufällige Ganzzahl zwischeh min und max
+  /**
+   * @param min Untere Grenze
+   * @param max Obere Grenze
+   * @returns Zufällige Ganzzahl zwischeh min und max
+   */
   getRandomInt(min: number, max: number): number {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min;
   }
 
-  // Setzt den gewählten Dienstleister und öffnet Kalenderübersicht
+  /**
+   * Setzt den gewählten Dienstleister und öffnet Kalenderübersicht
+   * @param provider Gewählter Dienstleister
+   */
   chooseDateSlide(provider: ProviderModel) {
     this.observableProviders.unsubscribe();
     if (provider === null) {

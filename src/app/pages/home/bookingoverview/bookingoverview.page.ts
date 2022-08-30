@@ -23,7 +23,9 @@ export class BookingoverviewPage {
     }
   }
 
-  // Löscht Booking des Users und gibt Slots des Providers frei
+  /**
+   * Löscht Booking des Users und gibt Slots des Providers frei
+   */
   async cancelBooking() {
     const alert = await this.alertController.create({
       header: 'Termin stornieren?',
@@ -50,12 +52,18 @@ export class BookingoverviewPage {
     await alert.present();
   }
 
-  // Öffnet Telefon Anwendung mit Nummer des Providers
+  /**
+   * Öffnet Telefon Anwendung mit Nummer des Providers
+   * @param phoneNumber Anzurufende Telefonnummer
+   */
   callNumber(phoneNumber: string) {
     window.open('tel:' + phoneNumber);
   }
 
-  // Öffnet Email Anwendung mit Email Adresse des Providers
+  /**
+   * Öffnet Email Anwendung mit Email Adresse des Providers
+   * @param mail Empfänger Email Adresse
+   */
   sendMail(mail: string) {
     window.open('mailto:' + mail);
   }
