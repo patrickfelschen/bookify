@@ -51,4 +51,8 @@ export class BookingoverviewPage implements OnInit {
     });
     await alert.present();
   }
+
+  callNumber(phoneNumber: string) {
+    window.open('tel:' + phoneNumber);
+  }
 }
