@@ -158,7 +158,10 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.next();
   }
 
-  // Setzt den gewählen Termin und öffnet Gesamtübersicht
+  /**
+   * Setzt den gewählen Termin und öffnet Gesamtübersicht
+   * @param date Gewähltes Datum
+   */
   async confirmSlide(date) {
     this.observableSlots.unsubscribe();
     this.slotDate = date;
@@ -170,6 +173,9 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.next();
   }
 
+  /**
+   * Eintragen der Buchung in Firestore
+   */
   async confirmBooking() {
     // Erstellen eines neuen Bookings mit den gewählten Daten
     const booking = new BookingModel({
@@ -213,8 +219,10 @@ export class BookingwizardPage implements OnInit, OnDestroy {
       slotmodels.push(slot2);
     }
 
+    // Speicher Buchung im User und belegte Slots im Provider
     await this.firestoreService.createBooking(booking, slotmodels);
 
+    // Ermöglicht speichern des Termin in Smartphone Kalender Anwendung
     if (Capacitor.isNativePlatform()) {
       const alert = await this.alertController.create({
         header: 'Termin speichern?',
@@ -244,6 +252,10 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Reagiert auf Kalenderänderungen
+   * @param value Gewähltes Datum als ISO-String
+   */
   async calendarChange(value) {
     const dateTime = parseISO(value);
 
@@ -264,10 +276,20 @@ export class BookingwizardPage implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Stellt nur die Tage im Kalender zur Auswahl, die in Zukunft liegen
+   * @param dateString Kalendertag
+   * @returns true - Tag liegt in Zukunft, false - Tag liegt in Vergangenheit
+   */
   isValidDay(dateString: string) {
     return new Date(dateString) >= new Date();
   }
 
+  /**
+   * Bringt die Dauer der Dienstleistung in geeignetes Format
+   * @param duration Dauer der Dienstleistung in Millisekunden
+   * @returns Dauer der Diensleitung in Stunden/Minuten
+   */
   calculateDuration(duration: number) {
     if (this.config == null) {
       return;
