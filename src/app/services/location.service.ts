@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Geolocation } from '@capacitor/geolocation';
-import { NativeGeocoder, NativeGeocoderResult, NativeGeocoderOptions } from '@awesome-cordova-plugins/native-geocoder/ngx';
+import { NativeGeocoder, NativeGeocoderOptions } from '@awesome-cordova-plugins/native-geocoder/ngx';
 
 @Injectable({
   providedIn: 'root',
@@ -8,6 +8,11 @@ import { NativeGeocoder, NativeGeocoderResult, NativeGeocoderOptions } from '@aw
 export class LocationService {
   constructor(private nativeGeocoder: NativeGeocoder) {}
 
+  /**
+   * Ortet den Benutzer und liefert die Adresse mittels GeoCoder zurück
+   *
+   * @returns Adresse des Benutzers
+   */
   async getCurrentAddress() {
     // Position auslesen
     const posOptions: PositionOptions = {
