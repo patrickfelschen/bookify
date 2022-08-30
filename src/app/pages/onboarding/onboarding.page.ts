@@ -31,8 +31,8 @@ export class OnboardingPage implements OnInit {
   }
 
   // Autoplay nach Laden der Page starten
-  ionViewWillEnter() {
-    SplashScreen.hide();
+  async ionViewWillEnter() {
+    await SplashScreen.hide();
     this.onboardingSlides.startAutoplay();
   }
 

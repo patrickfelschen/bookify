@@ -36,8 +36,8 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
-  ionViewWillEnter() {
-    SplashScreen.hide();
+  async ionViewWillEnter() {
+    await SplashScreen.hide();
   }
 
   ngOnDestroy(): void {
