@@ -28,6 +28,9 @@ export class SignupPage implements OnInit {
     return this.credentials.get('password');
   }
 
+  /**
+   * Initialisierung der Validators für E-Mail und Passwort
+   */
   ngOnInit() {
     this.credentials = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -35,6 +38,11 @@ export class SignupPage implements OnInit {
     });
   }
 
+  /**
+   * Benutzer bei Firebase Auth mit E-Mail und Passwort Registrieren.
+   * Der Benutzer erhält eine Rückmeldung, ob der Vorgang erfolgreich war.
+   * Danch wird zum Complete Profile Screen navigiert, um ein Profil anzulegen.
+   */
   async signUp() {
     // Ladeanzeige anzeigen
     const loading = await this.loadingController.create();
@@ -54,8 +62,8 @@ export class SignupPage implements OnInit {
   /**
    * Zeigt eine Alert Nachricht
    *
-   * @param header Überschrift Zeichenkette
-   * @param message Nachricht Zeichenkette
+   * @param header Überschrift
+   * @param message Nachricht
    */
      async showAlert(header: string, message: string) {
       const alert = await this.alertController.create({
@@ -66,7 +74,10 @@ export class SignupPage implements OnInit {
       await alert.present();
     }
 
-    async navigateToSignIn() {
+    /**
+     * Navigiert zum Anmelden Screen
+     */
+    navigateToSignIn() {
       this.router.navigateByUrl('signin', { replaceUrl: true });
     }
 }
