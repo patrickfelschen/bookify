@@ -24,6 +24,9 @@ export class ProfilePage implements OnInit, OnDestroy {
   ) {
   }
 
+  /**
+   * E-Mail aus Firebase Auth auslesen und Benutzerdaten aus Firestore laden.
+   */
   ngOnInit() {
     this.mail = this.firestoreService.getCurrentAuthUser().email;
     this.userObservable = this.firestoreService.streamUserProfile().subscribe(userModel => {
@@ -31,15 +34,23 @@ export class ProfilePage implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Um mehrfach Subscriptions zu vermeiden werden alle Subscriptions abgemeldet.
+   */
   ngOnDestroy() {
     this.userObservable.unsubscribe();
   }
 
+  /**
+   * Zurück zum Home Screen navigieren.
+   */
   back(){
-    this.userObservable.unsubscribe();
     this.router.navigateByUrl('home', { replaceUrl: true });
   }
 
+  /**
+   * Benutzer von Firebase Auth abmelden und zum Anmelde Screen navigieren.
+   */
   async signOut() {
     // Ladeanzeige anzeigen
     const loading = await this.loadingController.create();
