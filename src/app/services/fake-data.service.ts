@@ -29,6 +29,9 @@ export class FakeDataService {
     this.servicesCollection = collection(this.firestore, 'services').withConverter(serviceModelConverter);
   }
 
+  /**
+   * Erstellt Fake Dienstleistungen zum Testen der Anwendung
+   */
   async createServices() {
     const services: ServiceModel[] = [];
     services.push(new ServiceModel({ description: 'Hochzeits DJ (bis 50 Pers.)', duration: 8 }));
@@ -51,12 +54,25 @@ export class FakeDataService {
     }
   }
 
+  /**
+   * @param min Untere Grenze
+   * @param max Obere Grenze
+   * @returns Zufällige Ganzzahl zwischeh min und max
+   */
   getRandomInt(min: number, max: number): number {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min;
   }
 
+  /**
+   * Generiert eine Anzahl an Fake Dienstleister mit definierten Regeln.
+   * Jeder Dienstleister erhält eine zufällige Anzahl an Dienstleistungen,
+   * zwischen 4 und der maximalen Anzahl an vorhandenen Dienstleistungen.
+   * Zudem werden zufällige Personendaten generiert.
+   *
+   * @param count Anzahl an Dienstleister
+   */
   async generateProviders(count: number) {
     await this.createServices();
 
@@ -87,6 +103,12 @@ export class FakeDataService {
     }
   }
 
+  /**
+   * Erstellt Öffnungszeiten
+   * MO-SA von 00:00 - 23:00,
+   * SO von 00:00 - 05:00
+   * und einer Slotgröße von einer Stunde.
+   */
   async createSlotConfig() {
     const slotMillis = 60 * 60 * 1000; // 1h
     const openSlots: number[] = [];
