@@ -3,6 +3,9 @@ import { DateModel } from './date.model';
 import { ProviderModel } from './provider.model';
 import { ServiceModel } from './service.mode';
 
+/**
+ * Klasse für Buchungen von Benutzer
+ */
 export class BookingModel {
   public uid?: string;
   public date: DateModel;

@@ -4,6 +4,10 @@ import {
   Timestamp,
 } from '@angular/fire/firestore';
 
+/**
+ * Klasse für Zeitfenster, welche bei
+ * einem Dienstleister gebucht werden können.
+ */
 export class SlotModel {
   public uid?: string;
   public bookingUid: string;

@@ -1,6 +1,9 @@
 import { Timestamp } from '@angular/fire/firestore';
 import { format } from 'date-fns';
 
+/**
+ * Klasse für Start und Ende einer Buchung
+ */
 export class DateModel {
   public start: number;
   public end: number;

@@ -1,5 +1,10 @@
 import { DocumentSnapshot, SnapshotOptions } from '@angular/fire/firestore';
 
+/**
+ * Klasse für Dienstleister
+ * Dienstleister halten IDs von Dienstleistungen,
+ * um zugeordnet werden zu können.
+ */
 export class ProviderModel {
   public uid?: string;
   public name: string;
