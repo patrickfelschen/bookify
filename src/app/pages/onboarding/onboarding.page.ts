@@ -30,19 +30,26 @@ export class OnboardingPage implements OnInit {
   ngOnInit() {
   }
 
-  // Autoplay nach Laden der Page starten
+  /**
+   * SplashScreen ausblenden
+   * Autoplay nach Laden der Page starten
+   */
   async ionViewWillEnter() {
     await SplashScreen.hide();
     this.onboardingSlides.startAutoplay();
   }
 
-  // Autoplay nach Verlassen der Page stoppen
-  // Ermöglicht bei wiederholtem Betreten des Onboardings erneutes Starten des Autoplays
+  /**
+   * Autoplay nach Verlassen der Page stoppen
+   * Ermöglicht bei wiederholtem Betreten des Onboardings erneutes Starten des Autoplays
+   */
   ionViewWillLeave() {
     this.onboardingSlides.stopAutoplay();
   }
 
-  // Überspringen des Onboardings, navigieren zur Page 'Home'
+  /**
+   * Überspringen des Onboardings, navigieren zur Page 'Home'
+   */
   skip(): void {
     this.router.navigateByUrl('/signin', { replaceUrl: true });
   }
