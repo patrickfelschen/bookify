@@ -1,5 +1,8 @@
 import { DocumentSnapshot, SnapshotOptions } from '@angular/fire/firestore';
 
+/**
+ * Klasse für Benutzerdaten, diese werden beim Anmelden erfasst.
+ */
 export class UserModel {
   public uid?: string;
   public firstname: string;

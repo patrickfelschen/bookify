@@ -1,5 +1,9 @@
 import { DocumentSnapshot, SnapshotOptions } from '@angular/fire/firestore';
 
+/**
+ * Klasse für Dienstleistungen
+ * Über die Dauer (Duration) lässt sich Länge einer Dienstleistung berechnen.
+ */
 export class ServiceModel {
   public uid?: string;
   public description: string;

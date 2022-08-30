@@ -1,5 +1,9 @@
 import { DocumentSnapshot, SnapshotOptions } from '@angular/fire/firestore';
-
+/**
+ * Klasse für globale Einstellungen von Zeitfenstern.
+ * "slotMillis" gibt die Länge eines buchbaren Zeitfensters an.
+ * Zudem können pro Wochentag Öffnungszeiten definiert werden.
+ */
 export class SlotConfigModel {
   constructor(
     public slotMillis: number,
