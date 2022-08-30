@@ -116,6 +116,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
 
   /**
    * Setzt die gewählte Dienstleistung und ruft verfügbare Dienstleister ab
+   *
    * @param service Gewählter Service
    */
   chooseProviderSlide(service: ServiceModel) {
@@ -142,6 +143,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
 
   /**
    * Setzt den gewählten Dienstleister und öffnet Kalenderübersicht
+   *
    * @param provider Gewählter Dienstleister
    */
   chooseDateSlide(provider: ProviderModel) {
@@ -160,6 +162,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
 
   /**
    * Setzt den gewählen Termin und öffnet Gesamtübersicht
+   *
    * @param date Gewähltes Datum
    */
   async confirmSlide(date) {
@@ -254,6 +257,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
 
   /**
    * Reagiert auf Kalenderänderungen
+   *
    * @param value Gewähltes Datum als ISO-String
    */
   async calendarChange(value) {
@@ -278,6 +282,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
 
   /**
    * Stellt nur die Tage im Kalender zur Auswahl, die in Zukunft liegen
+   *
    * @param dateString Kalendertag
    * @returns true - Tag liegt in Zukunft, false - Tag liegt in Vergangenheit
    */
@@ -287,6 +292,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
 
   /**
    * Bringt die Dauer der Dienstleistung in geeignetes Format
+   *
    * @param duration Dauer der Dienstleistung in Millisekunden
    * @returns Dauer der Diensleitung in Stunden/Minuten
    */
