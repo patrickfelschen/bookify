@@ -13,6 +13,13 @@ import {
 export class AuthService {
   constructor(private auth: Auth) {}
 
+  /**
+   * Erstellt ein neues Konto bei Firebase Auth
+   *
+   * @param email E-Mail des Benutzers
+   * @param password Passwort des Bentzers
+   * @returns Benutzerdaten wenn Vorgang erfolgreich, ansonsten null
+   */
   async signUp({ email, password }) {
     try {
       const user = await createUserWithEmailAndPassword(
@@ -26,6 +33,13 @@ export class AuthService {
     }
   }
 
+  /**
+   * Meldet den Benutzer bei Firebase Auth an
+   *
+   * @param email E-Mail des Benutzers
+   * @param password Passwort des Bentzers
+   * @returns Benutzerdaten wenn Vorgang erfolgreich, ansonsten null
+   */
   async signIn({ email, password }) {
     try {
       const user = await signInWithEmailAndPassword(this.auth, email, password);
@@ -35,6 +49,12 @@ export class AuthService {
     }
   }
 
+  /**
+   * Setzt das Password des Benutzers zurück
+   *
+   * @param email E-Mail des Benutzers
+   * @returns true wenn Vorgang erfolgreich
+   */
   async resetPassword({ email }) {
     try {
       await sendPasswordResetEmail(this.auth, email);
@@ -44,7 +64,10 @@ export class AuthService {
     }
   }
 
+  /**
+   * Meldet den Benutzer von Firebase Auth ab
+   */
   async signOut() {
-    return await signOut(this.auth);
+    await signOut(this.auth);
   }
 }

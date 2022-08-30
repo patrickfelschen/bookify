@@ -54,6 +54,7 @@ export class BookingoverviewPage {
 
   /**
    * Öffnet Telefon Anwendung mit Nummer des Providers
+   *
    * @param phoneNumber Anzurufende Telefonnummer
    */
   callNumber(phoneNumber: string) {
@@ -62,6 +63,7 @@ export class BookingoverviewPage {
 
   /**
    * Öffnet Email Anwendung mit Email Adresse des Providers
+   *
    * @param mail Empfänger Email Adresse
    */
   sendMail(mail: string) {

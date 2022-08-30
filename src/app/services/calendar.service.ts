@@ -9,6 +9,11 @@ export class CalendarService {
 
   constructor(private calendar: Calendar) {}
 
+  /**
+   * Erstellt einen Eintrag im Smartphone Kalender
+   *
+   * @param booking Buchung welche abgespeichert werden soll
+   */
   async createBookingEvent(booking: BookingModel) {
     this.calendar
       .createEventInteractively(
