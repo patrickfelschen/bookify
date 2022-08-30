@@ -25,15 +25,15 @@
           </ion-label>
         </ion-item>
         <ion-item button lines="full">
-          <ion-icon name="mail" slot="start" color="primary"></ion-icon>
+          <ion-icon button name="mail" slot="start" color="primary"></ion-icon>
           <ion-label>
             <h2>{{ this.currentBooking?.provider.name }}</h2>
-            <h3>{{ this.currentBooking?.provider.email }}</h3>
+            <h3 (click)="sendMail(this.currentBooking?.provider.email)">{{ this.currentBooking?.provider.email }}</h3>
           </ion-label>
         </ion-item>
-        <ion-item button lines="full">
+        <ion-item button (click)="callNumber(this.currentBooking?.provider.phone)" lines="full">
           <ion-icon name="call" slot="start" color="primary"></ion-icon>
-          <ion-label (click)="callNumber(this.currentBooking?.provider.phone)">{{ this.currentBooking?.provider.phone }}</ion-label>
+          <ion-label>{{ this.currentBooking?.provider.phone }}</ion-label>
         </ion-item>
       </ion-col>
     </ion-row>

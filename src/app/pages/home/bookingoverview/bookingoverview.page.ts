@@ -55,4 +55,8 @@ export class BookingoverviewPage implements OnInit {
   callNumber(phoneNumber: string) {
     window.open('tel:' + phoneNumber);
   }
+
+  sendMail(mail: string) {
+    window.open('mailto:' + mail);
+  }
 }
