@@ -62,6 +62,9 @@ export class CompleteprofilePage implements OnInit {
     return this.address.get('city');
   }
 
+  /**
+   * Initialisierung der Validators für Namen und Adresse
+   */
   ngOnInit() {
     this.name = this.fb.group({
       firstname: ['', [Validators.required, Validators.maxLength(30)]],
@@ -76,6 +79,9 @@ export class CompleteprofilePage implements OnInit {
     });
   }
 
+  /**
+   * Benutzer von Firebase Auth abmelden
+   */
   async signOut() {
     // Ladeanzeige anzeigen
     const loading = await this.loadingController.create();
@@ -85,6 +91,9 @@ export class CompleteprofilePage implements OnInit {
     this.router.navigateByUrl('signin', { replaceUrl: true });
   }
 
+  /**
+   * Benutzer Orten und Automatisch die Adressfelder ausfüllen.
+   */
   async fillLocation() {
     const loading = await this.loadingController.create();
     const result = await this.locationService.getCurrentAddress();
@@ -98,10 +107,9 @@ export class CompleteprofilePage implements OnInit {
     await loading.dismiss();
   }
 
-  nextSlide() {
-    this.slides.slideNext();
-  }
-
+  /**
+   * Profildaten in Firestore abspeichern und Benutzer zum Home Screen navigieren
+   */
   async createProfile() {
     const loading = await this.loadingController.create();
     const userModel = new UserModel({
@@ -124,8 +132,8 @@ export class CompleteprofilePage implements OnInit {
   /**
    * Zeigt eine Alert Nachricht
    *
-   * @param header Überschrift Zeichenkette
-   * @param message Nachricht Zeichenkette
+   * @param header Überschrift
+   * @param message Nachricht
    */
   async showAlert(header: string, message: string) {
     const alert = await this.alertController.create({
@@ -134,5 +142,12 @@ export class CompleteprofilePage implements OnInit {
       buttons: ['OK'],
     });
     await alert.present();
+  }
+
+  /**
+   * Zum nächsten Schritt wischen
+   */
+  nextSlide() {
+    this.slides.slideNext();
   }
 }
