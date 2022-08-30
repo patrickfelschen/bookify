@@ -15,6 +15,7 @@ export class SlotService {
 
   /**
    * Liefert die Verfügbaren Termine des gewählten Tages, bzw. gewählter Tag + dayCount, zurück
+   *
    * @param date In Kalender gewähltes Datum
    * @param bookedSlots Vorhandene Buchungen des Providers (belegte Slots)
    * @param dayCount Anzahl nächsten Tage, die mit einbezogen werden sollen
@@ -66,6 +67,7 @@ export class SlotService {
 
   /**
    * Entfernt die Terminslots aus den verfügbaren Slots, die nicht genügen Zeit für die gewählte Dienstleistung bieten
+   *
    * @param date In Kalender gewähltes Datum
    * @param singleSlotMillis Länge eines Zeitslots in Millisekunden
    * @param duration Anzahl an Slots, die eine Dienstleistung einnimmt
@@ -117,6 +119,7 @@ export class SlotService {
 
   /**
    * Liest aus der Konfiguration die verfügbaren Slots für den gewählten Wochentag
+   *
    * @param weekDay Gewählter Tag der Woche (1- 7)
    * @returns Verfügbare Slots des Wochentages
    */
@@ -150,6 +153,7 @@ export class SlotService {
 
   /**
    * Liefert Map aller möglichen Slots (Key = timestamp des Slots)
+   *
    * @param date Gewähltes Datum
    * @param dayCount Anzahl an weiteren Tagen, die mit einbezogen werden sollen
    * @returns Alle möglichen Slots der gewählten Tage
