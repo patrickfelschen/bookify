@@ -35,7 +35,7 @@ export class SignupPage implements OnInit {
     });
   }
 
-  async signUp(){
+  async signUp() {
     // Ladeanzeige anzeigen
     const loading = await this.loadingController.create();
     await loading.present();

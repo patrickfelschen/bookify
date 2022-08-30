@@ -27,7 +27,14 @@ export class HomePage implements OnInit, OnDestroy {
     private fakedataService: FakeDataService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    // Prüfen ob ein User Profil bereits existiert
+    const userExists = await this.firestoreService.userProfileExists();
+    if (userExists === false) {
+      // Profil muss erstellt werden
+      this.router.navigateByUrl('completeprofile', { replaceUrl: true });
+    }
+    await SplashScreen.hide();
     this.observableFutureBookings = this.firestoreService.streamFutureBooking().subscribe(bookings =>{
       this.futureBookings = bookings;
     });
