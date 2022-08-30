@@ -28,6 +28,7 @@ export const bookingModelConverter = {
       name: m.provider.name,
       email: m.provider.email,
       phone: m.provider.phone,
+      avatar: m.provider.avatar,
     },
     service: {
       uid: m.service.uid,

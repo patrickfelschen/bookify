@@ -1,4 +1,5 @@
 import { Timestamp } from '@angular/fire/firestore';
+import { format } from 'date-fns';
 
 export class DateModel {
   public start: number;
@@ -18,10 +19,10 @@ export class DateModel {
   }
 
   getStartTimeString() {
-    return new Date(this.start).toLocaleString();
+    return format(new Date(this.start), 'dd.MM.yyyy HH:mm');
   }
 
   getEndTimeString() {
-    return new Date(this.end).toLocaleString();
+    return format(new Date(this.end), 'dd.MM.yyyy HH:mm');
   }
 }

@@ -53,7 +53,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   profile(): void {
-    //this.fakedataService.generateProviders(40);
+    this.fakedataService.generateProviders(80);
     //this.fakedataService.createSlotConfig();
     this.router.navigateByUrl('profile');
   }

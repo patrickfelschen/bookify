@@ -75,7 +75,8 @@ export class FakeDataService {
         name: `DJ ${firstname}`,
         email: faker.internet.email(firstname),
         phone: faker.phone.number('+49 #### #####'),
-        serviceUids: providerServices
+        serviceUids: providerServices,
+        avatar: faker.image.avatar()
       });
       this.providers.push(newProvider);
     }

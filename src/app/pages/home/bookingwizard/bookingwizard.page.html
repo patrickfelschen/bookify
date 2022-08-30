@@ -58,7 +58,10 @@
               </ion-item>
               <div *ngFor="let provider of providers">
                 <ion-item lines="full" button (click)="chooseDateSlide(provider)">
-                  <ion-icon name="person" slot="start" color="primary"></ion-icon>
+                  <!-- <ion-icon name="person" slot="start" color="primary"></ion-icon> -->
+                  <ion-avatar slot="start">
+                    <img [src]="provider.avatar">
+                  </ion-avatar>
                   <ion-label>
                     <h2>{{ provider.name }}</h2>
                   </ion-label>
