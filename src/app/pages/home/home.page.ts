@@ -34,19 +34,26 @@ export class HomePage implements OnInit, OnDestroy {
       // Profil muss erstellt werden
       this.router.navigateByUrl('completeprofile', { replaceUrl: true });
     }
-    await SplashScreen.hide();
+    // Liste der nächsten Termine
     this.observableFutureBookings = this.firestoreService.streamFutureBooking().subscribe(bookings =>{
       this.futureBookings = bookings;
     });
+    // Liste vergangener Termine
     this.observablePastBookings = this.firestoreService.streamPastBooking().subscribe(bookings =>{
       this.pastBookings = bookings;
     });
   }
 
+  /**
+   * SplashScreen ausblenden wenn Seite geladen ist
+   */
   async ionViewWillEnter() {
     await SplashScreen.hide();
   }
 
+  /**
+   * Keine Live-Daten mehr abrufen wenn Screen geschlossen
+   */
   ngOnDestroy(): void {
     this.observableFutureBookings.unsubscribe();
     this.observablePastBookings.unsubscribe();
@@ -58,6 +65,10 @@ export class HomePage implements OnInit, OnDestroy {
     this.router.navigateByUrl('profile');
   }
 
+  /**
+   * Ruft die Booking Übersicht auf und setzt das ausgewählte Objekt in den State
+   * @param booking Gewähltes Booking Objekt
+   */
   bookingOverview(booking): void {
     this.router.navigateByUrl('bookingoverview', { state: { currentBooking: booking } });
   }

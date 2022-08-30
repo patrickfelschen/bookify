@@ -10,22 +10,22 @@ import { Timestamp } from '@angular/fire/firestore';
   templateUrl: './bookingoverview.page.html',
   styleUrls: ['./bookingoverview.page.scss'],
 })
-export class BookingoverviewPage implements OnInit {
+export class BookingoverviewPage {
   inFuture: boolean;
 
   currentBooking: BookingModel;
 
   constructor(private router: Router, private firestoreService: FirestoreService, private alertController: AlertController) {
+    // Gewähltes Booking Objekt wird aus State geladen und geprüft, ob Termin in Zukunft liegt
     if(this.router.getCurrentNavigation().extras.state) {
       this.currentBooking = this.router.getCurrentNavigation().extras.state.currentBooking;
       this.inFuture = this.currentBooking.date.start > Timestamp.fromDate(new Date()).toMillis();
     }
   }
 
-  ngOnInit() {
-    console.log(this.inFuture);
-  }
-
+  /**
+   * Löscht Booking des Users und gibt Slots des Providers frei
+   */
   async cancelBooking() {
     const alert = await this.alertController.create({
       header: 'Termin stornieren?',
@@ -52,10 +52,18 @@ export class BookingoverviewPage implements OnInit {
     await alert.present();
   }
 
+  /**
+   * Öffnet Telefon Anwendung mit Nummer des Providers
+   * @param phoneNumber Anzurufende Telefonnummer
+   */
   callNumber(phoneNumber: string) {
     window.open('tel:' + phoneNumber);
   }
 
+  /**
+   * Öffnet Email Anwendung mit Email Adresse des Providers
+   * @param mail Empfänger Email Adresse
+   */
   sendMail(mail: string) {
     window.open('mailto:' + mail);
   }
