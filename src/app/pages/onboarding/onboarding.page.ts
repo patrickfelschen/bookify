@@ -20,7 +20,7 @@ export class OnboardingPage implements OnInit {
     initialSlide: 0,
     speed: 1000, // Geschwindigkeit der Animation
     autoplay: {
-      delay: 5000
+      delay: 8000
     }
   };
 

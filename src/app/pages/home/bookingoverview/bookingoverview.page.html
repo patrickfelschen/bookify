@@ -24,11 +24,7 @@
             <h3>{{ this.currentBooking?.date.getEndTimeString() }}</h3>
           </ion-label>
         </ion-item>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>
-        <ion-item lines="full">
+        <ion-item button lines="full">
           <ion-icon name="mail" slot="start" color="primary"></ion-icon>
           <ion-label>
             <h2>{{ this.currentBooking?.provider.name }}</h2>

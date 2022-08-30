@@ -18,17 +18,7 @@
     </ion-row>
     <ion-row>
       <ion-col>
-        <ion-item lines="none">
-          <ion-icon name="mail" slot="start" color="primary"></ion-icon>
-          <ion-label>
-            <h2>{{ this.mail }}</h2>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>
-        <ion-item lines="none">
+        <ion-item lines="full">
           <ion-icon name="person" slot="start" color="primary"></ion-icon>
           <ion-label>
             <h2>{{ this.user?.firstname }} {{ this.user?.lastname }}</h2>
@@ -38,11 +28,21 @@
     </ion-row>
     <ion-row>
       <ion-col>
-        <ion-item lines="none">
+        <ion-item lines="full">
           <ion-icon name="home" slot="start" color="primary"></ion-icon>
           <ion-label>
             <h2>{{ this.user?.addressline1 }}</h2>
             <h2>{{ this.user?.city }}</h2>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item lines="full">
+          <ion-icon name="mail" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h2>{{ this.mail }}</h2>
           </ion-label>
         </ion-item>
       </ion-col>
