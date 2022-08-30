@@ -270,6 +270,7 @@ export class BookingwizardPage implements OnInit, OnDestroy {
     this.observableSlots = this.firestoreService
       .streamSlotsByProvider(this.selectedProvider, dateTime, this.dayCount)
       .subscribe((bookedSlots) => {
+        console.log(bookedSlots);
         this.availableSlots = this.slotService.getAvailableSlots(
           dateTime,
           bookedSlots,
