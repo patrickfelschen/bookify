@@ -4,7 +4,7 @@ import { FirestoreService } from '../../../services/firestore.service';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { UserModel } from 'src/app/models/user.model';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -21,17 +21,18 @@ export class ProfilePage implements OnInit, OnDestroy {
     private router: Router,
     private loadingController: LoadingController,
     private firestoreService: FirestoreService
-  ) {
-  }
+  ) {}
 
   /**
    * E-Mail aus Firebase Auth auslesen und Benutzerdaten aus Firestore laden.
    */
   ngOnInit() {
     this.mail = this.firestoreService.getCurrentAuthUser().email;
-    this.userObservable = this.firestoreService.streamUserProfile().subscribe(userModel => {
-      this.user = userModel;
-    });
+    this.userObservable = this.firestoreService
+      .streamUserProfile()
+      .subscribe((userModel) => {
+        this.user = userModel;
+      });
   }
 
   /**
@@ -44,7 +45,7 @@ export class ProfilePage implements OnInit, OnDestroy {
   /**
    * Zurück zum Home Screen navigieren.
    */
-  back(){
+  back() {
     this.router.navigateByUrl('home', { replaceUrl: true });
   }
 
