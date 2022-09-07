@@ -60,13 +60,14 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   profile(): void {
-    // this.fakedataService.generateProviders(80);
-    // this.fakedataService.createSlotConfig();
+    //this.fakedataService.createSlotConfig();
+    //this.fakedataService.generateProviders(80);
     this.router.navigateByUrl('profile');
   }
 
   /**
    * Ruft die Booking Übersicht auf und setzt das ausgewählte Objekt in den State
+   *
    * @param booking Gewähltes Booking Objekt
    */
   bookingOverview(booking): void {
