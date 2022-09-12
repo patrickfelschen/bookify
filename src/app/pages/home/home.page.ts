@@ -42,6 +42,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.observablePastBookings = this.firestoreService.streamPastBooking().subscribe(bookings =>{
       this.pastBookings = bookings;
     });
+    console.log('HOME INIT');
   }
 
   /**
@@ -57,6 +58,7 @@ export class HomePage implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.observableFutureBookings.unsubscribe();
     this.observablePastBookings.unsubscribe();
+    console.log('HOME DESTROY');
   }
 
   profile(): void {
