@@ -13,7 +13,7 @@ import { SplashScreen } from '@capacitor/splash-screen';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage implements OnInit, OnDestroy {
+export class HomePage {
   observableFutureBookings: Subscription = Subscription.EMPTY;
   observablePastBookings: Subscription = Subscription.EMPTY;
 
@@ -27,7 +27,10 @@ export class HomePage implements OnInit, OnDestroy {
     private fakedataService: FakeDataService
   ) {}
 
-  async ngOnInit() {
+  /**
+   * SplashScreen ausblenden wenn Seite geladen ist
+   */
+  async ionViewWillEnter() {
     // Prüfen ob ein User Profil bereits existiert
     const userExists = await this.firestoreService.userProfileExists();
     if (userExists === false) {
@@ -42,19 +45,13 @@ export class HomePage implements OnInit, OnDestroy {
     this.observablePastBookings = this.firestoreService.streamPastBooking().subscribe(bookings =>{
       this.pastBookings = bookings;
     });
-  }
-
-  /**
-   * SplashScreen ausblenden wenn Seite geladen ist
-   */
-  async ionViewWillEnter() {
     await SplashScreen.hide();
   }
 
   /**
    * Keine Live-Daten mehr abrufen wenn Screen geschlossen
    */
-  ngOnDestroy(): void {
+  ionViewDidLeave() {
     this.observableFutureBookings.unsubscribe();
     this.observablePastBookings.unsubscribe();
   }
